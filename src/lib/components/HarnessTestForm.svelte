@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { harnessLimits } from '$lib/harness/harnessEvents';
+	import ActionButton from './ActionButton.svelte';
 	import ModelPicker from './ModelPicker.svelte';
 
 	type TestChoice = { checkout: string; taskText: string; model: string };
@@ -25,27 +26,29 @@
 
 <form class="grid gap-3" onsubmit={run}>
 	<ModelPicker {models} bind:modelId />
-	<label class="grid gap-1 text-etch">
+	<label class="grid gap-1 text-sm text-etch">
 		<span>The repository's folder on this Mac</span>
 		<input
-			class="rounded-lg border border-hairline bg-night px-3 py-2 text-chalk"
+			class="field"
 			placeholder="/Users/you/ybt-builds/YourBusinessToday"
 			required
 			maxlength={harnessLimits.longestCheckoutPath}
 			bind:value={checkout}
 		/>
 	</label>
-	<label class="grid gap-1 text-etch">
+	<label class="grid gap-1 text-sm text-etch">
 		<span>The task to build</span>
 		<textarea
-			class="min-h-28 rounded-lg border border-hairline bg-night px-3 py-2 text-chalk"
+			class="field min-h-28 resize-y"
 			placeholder="Paste an easy task's title and details"
 			required
 			maxlength={harnessLimits.longestTaskText}
 			bind:value={taskText}
 		></textarea>
 	</label>
-	<button class="justify-self-start rounded-lg bg-signal px-4 py-2 font-medium" disabled={isRunning || modelId === ''}>
-		{isRunning ? 'Running the test…' : 'Run the test'}
-	</button>
+	<div>
+		<ActionButton kind="primary" type="submit" isBusy={isRunning} busyText="Running the test…" disabled={modelId === ''}>
+			Run the test
+		</ActionButton>
+	</div>
 </form>

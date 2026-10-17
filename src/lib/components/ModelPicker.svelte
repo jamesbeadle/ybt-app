@@ -1,10 +1,10 @@
 <script lang="ts">
+	import SelectField from './SelectField.svelte';
+
 	let { models, modelId = $bindable() }: { models: string[]; modelId: string } = $props();
 </script>
 
-<label class="flex items-center gap-2 text-etch">
+<label class="flex items-center gap-2 text-sm text-etch">
 	<span>Local model</span>
-	<select class="rounded-lg border border-hairline bg-night px-2 py-1 text-chalk" bind:value={modelId}>
-		{#each models as model (model)}<option value={model}>{model}</option>{/each}
-	</select>
+	<SelectField choices={models} bind:value={modelId} label="Local model" class="min-w-56" />
 </label>

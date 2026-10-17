@@ -1,5 +1,10 @@
 <script lang="ts">
-	let { isGood, text }: { isGood: boolean; text: string } = $props();
+	import { statusDotClasses, statusTextClasses, type StatusPhase } from '$lib/status/statusPhase';
+
+	let { phase, text }: { phase: StatusPhase; text: string } = $props();
 </script>
 
-<p class={isGood ? 'text-go' : 'text-caution'}>{text}</p>
+<p class="flex items-center gap-2.5 transition-colors duration-300 {statusTextClasses[phase]}">
+	<span class="size-2.5 shrink-0 rounded-full transition-colors duration-300 {statusDotClasses[phase]}"></span>
+	<span>{text}</span>
+</p>

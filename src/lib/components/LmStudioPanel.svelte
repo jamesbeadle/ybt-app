@@ -1,34 +1,56 @@
 <script lang="ts">
-	import { fetch as desktopFetch } from '@tauri-apps/plugin-http';
+	import ActionButton from './ActionButton.svelte';
 	import Panel from './Panel.svelte';
 	import StatusLine from './StatusLine.svelte';
-	import { listLocalModels } from '$lib/lmStudio/lmStudio';
-	import { failureText } from '$lib/failures/failureText';
+	import { rememberedConnections } from '$lib/connections/connectionMemory.svelte';
+	import { checkLmStudio, modelCountPhrase } from '$lib/connections/lmStudioConnection';
+	import { phaseOf } from '$lib/status/statusPhase';
 
 	let { lmStudioOrigin }: { lmStudioOrigin: string } = $props();
 
-	let models = $state<string[]>([]);
-	let problem = $state('');
+	const memory = rememberedConnections.lmStudio;
+	let isChecking = $state(false);
 
-	async function readModels() {
-		problem = '';
-		models = await listLocalModels(desktopFetch, lmStudioOrigin).catch((failure: unknown) => {
-			problem = `LM Studio is not answering at ${lmStudioOrigin}: ${failureText(failure)}. Start its server in LM Studio's Developer tab.`;
-			return [];
-		});
+	const servedModels = $derived(memory.models);
+	const servedCount = $derived(servedModels.length);
+	const hasProblem = $derived(memory.problem !== '');
+	const isServing = $derived(!hasProblem && servedCount > 0);
+	const phase = $derived(phaseOf(memory.hasAnswered, isServing));
+	const statusText = $derived.by(() => {
+		if (hasProblem) return `LM Studio is not answering at ${lmStudioOrigin}.`;
+		if (!isServing) return `LM Studio is running at ${lmStudioOrigin} but serving no models.`;
+		return `Serving ${modelCountPhrase(servedCount)} at ${lmStudioOrigin}.`;
+	});
+	const hintText = $derived.by(() => {
+		if (hasProblem) return `${memory.problem} Start its server in LM Studio's Developer tab.`;
+		if (!isServing) return 'Load a model in LM Studio first.';
+		return '';
+	});
+
+	async function checkAgain() {
+		isChecking = true;
+		await checkLmStudio(lmStudioOrigin);
+		isChecking = false;
 	}
 
-	$effect(() => void readModels());
+	$effect(() => void checkLmStudio(lmStudioOrigin));
 </script>
 
 <Panel title="LM Studio">
-	{#if problem !== ''}
-		<StatusLine isGood={false} text={problem} />
+	{#if memory.hasAnswered}
+		<StatusLine {phase} text={statusText} />
+		{#if hintText !== ''}<p class="mt-1 pl-5 text-sm text-mist">{hintText}</p>{/if}
+		{#if isServing}
+			<ul class="mt-3 flex flex-wrap gap-2">
+				{#each servedModels as model (model)}
+					<li class="rounded-md border border-hairline bg-night px-2 py-1 font-mono text-xs text-etch">{model}</li>
+				{/each}
+			</ul>
+		{/if}
 	{:else}
-		<StatusLine isGood={true} text="Serving {models.length} model(s) at {lmStudioOrigin}." />
-		<ul class="mt-2 list-disc pl-5 text-etch">
-			{#each models as model (model)}<li>{model}</li>{/each}
-		</ul>
+		<StatusLine {phase} text="Looking for LM Studio at {lmStudioOrigin}…" />
 	{/if}
-	<button class="mt-3 rounded-lg border border-hairline px-3 py-1.5" onclick={readModels}>Check again</button>
+	<div class="mt-4">
+		<ActionButton isBusy={isChecking} busyText="Checking…" onclick={checkAgain}>Check again</ActionButton>
+	</div>
 </Panel>

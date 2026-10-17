@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { chatLimits } from '$lib/chat/chatLimits';
+	import ActionButton from './ActionButton.svelte';
 
-	let { isThinking, onsend }: { isThinking: boolean; onsend: (text: string) => void } = $props();
+	let {
+		isThinking,
+		canSend,
+		onsend
+	}: { isThinking: boolean; canSend: boolean; onsend: (text: string) => void } = $props();
 
 	let text = $state('');
 
@@ -14,15 +19,15 @@
 	}
 </script>
 
-<form class="flex gap-3" onsubmit={send}>
+<form class="flex items-end gap-3" onsubmit={send}>
 	<textarea
-		class="min-h-20 flex-1 rounded-lg border border-hairline bg-night px-3 py-2"
+		class="field min-h-20 flex-1 resize-y"
 		placeholder="Ask the local model to raise, read or update work in YBT"
 		required
 		maxlength={chatLimits.longestMessage}
 		bind:value={text}
 	></textarea>
-	<button class="self-end rounded-lg bg-signal px-4 py-2 font-medium" disabled={isThinking}>
-		{isThinking ? 'Thinking…' : 'Send'}
-	</button>
+	<ActionButton kind="primary" type="submit" isBusy={isThinking} busyText="Thinking…" disabled={!canSend}>
+		Send
+	</ActionButton>
 </form>

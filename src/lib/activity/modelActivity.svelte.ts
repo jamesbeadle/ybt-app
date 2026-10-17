@@ -13,6 +13,7 @@ export class ModelActivity {
 	modelProblem = $state('');
 	stepProblem = $state('');
 	refreshedAt = $state('');
+	hasRefreshed = $state(false);
 
 	loadedModelCount: number = $derived(this.models.filter((model) => model.isLoaded).length);
 	hasSteps: boolean = $derived(this.steps.length > 0);
@@ -22,6 +23,7 @@ export class ModelActivity {
 	async refresh(): Promise<void> {
 		await Promise.all([this.readModels(), this.readSteps()]);
 		this.refreshedAt = new Date().toLocaleTimeString();
+		this.hasRefreshed = true;
 	}
 
 	/** Refreshes now and every few seconds after; the returned function stops it. */

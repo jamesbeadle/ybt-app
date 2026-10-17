@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ModelRangesForm from '$lib/components/ModelRangesForm.svelte';
+	import ModelTiersPanel from '$lib/components/ModelTiersPanel.svelte';
 	import SettingsForm from '$lib/components/SettingsForm.svelte';
 	import type { PageProps } from './$types';
 
@@ -7,4 +7,4 @@
 </script>
 
 <SettingsForm settings={data.settings} />
-<ModelRangesForm />
+<ModelTiersPanel />

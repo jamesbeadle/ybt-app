@@ -27,3 +27,11 @@ export function validateRange(range: PointRange): string | null {
 	if (range.leastPoints > range.mostPoints) return 'The least points must not be more than the most.';
 	return null;
 }
+
+export function isSameRange(range: PointRange, other: PointRange): boolean {
+	return range.leastPoints === other.leastPoints && range.mostPoints === other.mostPoints;
+}
+
+export function rangePhrase(range: PointRange): string {
+	return `${range.leastPoints}–${range.mostPoints} points`;
+}
