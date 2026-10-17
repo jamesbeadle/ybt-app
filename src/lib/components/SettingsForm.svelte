@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
 	import Panel from './Panel.svelte';
 	import { saveSettings } from '$lib/desktopStore';
 	import { settingsLabels, type DesktopSettings } from '$lib/settings/desktopSettings';
@@ -16,6 +17,7 @@
 		problems = validateSettings(draft);
 		if (problems.length > 0) return;
 		await saveSettings({ ybtOrigin: originOf(draft.ybtOrigin), lmStudioOrigin: originOf(draft.lmStudioOrigin) });
+		await invalidateAll();
 		isSaved = true;
 	}
 </script>
