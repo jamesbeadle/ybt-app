@@ -1,6 +1,6 @@
 [package]
 name = "ybt-desktop"
-version = "0.3.0"
+version = "0.3.1"
 description = "The YBT desktop app on the Mac mini"
 edition = "2021"
 

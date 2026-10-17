@@ -6,5 +6,5 @@ export const oauthPaths = {
 } as const;
 
 export const oauthScope = 'ybt';
-export const clientName = 'YBT Desktop';
+export const clientName = 'YBT';
 export const redirectPath = '/callback';

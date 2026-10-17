@@ -5,7 +5,7 @@ use tauri::{AppHandle, Emitter};
 const LOOPBACK_ADDRESS: &str = "127.0.0.1:0";
 const REDIRECT_EVENT: &str = "sign-in-redirect";
 const SIGNED_IN_PAGE: &str = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n\
-<!doctype html><title>YBT Desktop</title><p>You are signed in. You can close this window and go back to YBT Desktop.</p>";
+<!doctype html><title>YBT</title><p>You are signed in. You can close this window and go back to YBT.</p>";
 
 /// Listens once on a loopback port for YBT's sign-in redirect and hands its path to the app.
 #[tauri::command]
