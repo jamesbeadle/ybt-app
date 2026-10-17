@@ -4,6 +4,7 @@
 	import '../app.css';
 	import type { Snippet } from 'svelte';
 	import { fly } from 'svelte/transition';
+	import { pageEntrance } from '$lib/motion/entrances';
 	import { page } from '$app/state';
 	import AppBrand from '$lib/components/AppBrand.svelte';
 	import AppNavigation from '$lib/components/AppNavigation.svelte';
@@ -11,7 +12,6 @@
 	let { children }: { children: Snippet } = $props();
 
 	const currentUrl = $derived(page.url);
-	const pageEntrance = { y: 6, duration: 180 };
 </script>
 
 <header
@@ -24,7 +24,7 @@
 
 <main class="mx-auto max-w-4xl p-6">
 	{#key currentUrl.pathname}
-		<div class="grid gap-6" in:fly={pageEntrance}>
+		<div class="grid gap-6" in:fly={pageEntrance()}>
 			{@render children()}
 		</div>
 	{/key}

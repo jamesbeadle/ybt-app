@@ -33,5 +33,7 @@ export function isSameRange(range: PointRange, other: PointRange): boolean {
 }
 
 export function rangePhrase(range: PointRange): string {
+	const isOneSize = range.leastPoints === range.mostPoints;
+	if (isOneSize) return `${range.leastPoints} points`;
 	return `${range.leastPoints}–${range.mostPoints} points`;
 }

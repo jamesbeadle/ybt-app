@@ -34,19 +34,24 @@ export class ModelActivity {
 	}
 
 	private async readModels(): Promise<void> {
+		const served = await listServedModels(desktopFetch, this.lmStudioOrigin).catch(
+			(failure: unknown) => new Error(failureText(failure))
+		);
+		if (served instanceof Error) {
+			this.modelProblem = `LM Studio is not answering at ${this.lmStudioOrigin}: ${served.message}`;
+			return;
+		}
 		this.modelProblem = '';
-		const served = await listServedModels(desktopFetch, this.lmStudioOrigin).catch((failure: unknown) => {
-			this.modelProblem = `LM Studio is not answering at ${this.lmStudioOrigin}: ${failureText(failure)}`;
-			return [];
-		});
 		this.models = loadedFirst(served);
 	}
 
 	private async readSteps(): Promise<void> {
+		const steps = await readRecentSteps().catch((failure: unknown) => new Error(failureText(failure)));
+		if (steps instanceof Error) {
+			this.stepProblem = `YBT did not answer: ${steps.message}`;
+			return;
+		}
 		this.stepProblem = '';
-		this.steps = await readRecentSteps().catch((failure: unknown) => {
-			this.stepProblem = `YBT did not answer: ${failureText(failure)}`;
-			return [];
-		});
+		this.steps = steps;
 	}
 }

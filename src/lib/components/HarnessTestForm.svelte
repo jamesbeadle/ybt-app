@@ -1,18 +1,15 @@
 <script lang="ts">
 	import { harnessLimits } from '$lib/harness/harnessEvents';
 	import ActionButton from './ActionButton.svelte';
-	import ModelPicker from './ModelPicker.svelte';
 
 	type TestChoice = { checkout: string; taskText: string; model: string };
 
 	let {
-		models,
-		modelId = $bindable(),
+		modelId,
 		checkout = $bindable(),
 		isRunning,
 		onrun
-	}: { models: string[]; modelId: string; checkout: string; isRunning: boolean; onrun: (choice: TestChoice) => void } =
-		$props();
+	}: { modelId: string; checkout: string; isRunning: boolean; onrun: (choice: TestChoice) => void } = $props();
 
 	let taskText = $state('');
 
@@ -25,7 +22,6 @@
 </script>
 
 <form class="grid gap-3" onsubmit={run}>
-	<ModelPicker {models} bind:modelId />
 	<label class="grid gap-1 text-sm text-etch">
 		<span>The repository's folder on this Mac</span>
 		<input

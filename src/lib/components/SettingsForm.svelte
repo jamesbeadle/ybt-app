@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import { fadeEntrance } from '$lib/motion/entrances';
 	import { invalidateAll } from '$app/navigation';
 	import ActionButton from './ActionButton.svelte';
 	import Panel from './Panel.svelte';
@@ -44,7 +45,7 @@
 		{#each problems as problem (problem)}<p class="text-sm text-signal">{problem}</p>{/each}
 		<div class="flex items-center gap-3">
 			<ActionButton kind="primary" type="submit" isBusy={isSaving} busyText="Saving…">Save</ActionButton>
-			{#if isSaved}<p class="text-sm text-go" transition:fade>Saved.</p>{/if}
+			{#if isSaved}<p class="text-sm text-go" transition:fade={fadeEntrance()}>Saved.</p>{/if}
 		</div>
 	</form>
 </Panel>

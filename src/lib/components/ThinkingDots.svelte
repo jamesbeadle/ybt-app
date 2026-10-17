@@ -7,7 +7,7 @@
 <p class="flex items-center gap-2 text-sm text-etch" role="status" aria-label={text}>
 	<span class="flex items-end gap-1">
 		{#each dotDelays as delay (delay)}
-			<span class="size-1.5 animate-bounce rounded-full bg-etch {delay}"></span>
+			<span class="size-2 animate-think rounded-full bg-etch {delay}"></span>
 		{/each}
 	</span>
 	<span>{text}</span>

@@ -2,8 +2,8 @@
 	import ActionButton from './ActionButton.svelte';
 	import Panel from './Panel.svelte';
 	import StatusLine from './StatusLine.svelte';
-	import { rememberedConnections } from '$lib/connections/connectionMemory.svelte';
-	import { checkYbtAccount } from '$lib/connections/ybtConnection';
+	import { hasAnsweredFor, rememberedConnections } from '$lib/connections/connectionMemory.svelte';
+	import { checkYbtAccount, confirmYbtAccount } from '$lib/connections/ybtConnection';
 	import { failureText } from '$lib/failures/failureText';
 	import { phaseOf } from '$lib/status/statusPhase';
 	import { signInToYbt, signOutOfYbt } from '$lib/ybt/signIn';
@@ -15,8 +15,9 @@
 	let isSigningIn = $state(false);
 	let isSigningOut = $state(false);
 
+	const hasAnswered = $derived(hasAnsweredFor(memory, ybtOrigin));
 	const account = $derived(memory.account);
-	const phase = $derived(phaseOf(memory.hasAnswered, account !== null));
+	const phase = $derived(phaseOf(hasAnswered, account !== null));
 	const statusText = $derived(
 		account === null ? `Not signed in to ${ybtOrigin}.` : `Signed in as ${account.email}`
 	);
@@ -27,22 +28,22 @@
 		signInProblem = '';
 		isSigningIn = true;
 		await signInToYbt(ybtOrigin).catch((failure: unknown) => (signInProblem = failureText(failure)));
-		await checkYbtAccount();
+		await confirmYbtAccount(ybtOrigin);
 		isSigningIn = false;
 	}
 
 	async function signOut() {
 		isSigningOut = true;
 		await signOutOfYbt();
-		await checkYbtAccount();
+		await confirmYbtAccount(ybtOrigin);
 		isSigningOut = false;
 	}
 
-	$effect(() => void checkYbtAccount());
+	$effect(() => void checkYbtAccount(ybtOrigin));
 </script>
 
 <Panel title="Your Business Today">
-	{#if memory.hasAnswered}
+	{#if hasAnswered}
 		<StatusLine {phase} text={statusText} />
 		{#if detailText !== ''}<p class="mt-1 pl-5 text-sm text-mist">{detailText}</p>{/if}
 	{:else}
@@ -50,7 +51,9 @@
 	{/if}
 	{#if problem !== ''}<p class="mt-2 text-sm text-signal">{problem}</p>{/if}
 	<div class="mt-4">
-		{#if account === null}
+		{#if !hasAnswered}
+			<ActionButton isBusy busyText="Checking…">Checking</ActionButton>
+		{:else if account === null}
 			<ActionButton kind="primary" isBusy={isSigningIn} busyText="Waiting for the browser…" onclick={signIn}>
 				Sign in to YBT
 			</ActionButton>

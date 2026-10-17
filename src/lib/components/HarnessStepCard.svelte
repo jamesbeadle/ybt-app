@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
+	import { rowEntrance } from '$lib/motion/entrances';
 	import { stepStates, type HarnessStepView, type StepState } from '$lib/harness/harnessEvents';
 	import Spinner from './Spinner.svelte';
 
@@ -14,9 +15,9 @@
 	let outcome = $derived(isRunning ? stateWords.running : `${stateWords[step.state]} in ${step.seconds}s`);
 </script>
 
-<li class="rounded-lg border border-hairline bg-carriage p-3 transition-colors duration-150" in:fly={{ y: 6, duration: 160 }}>
+<li class="rounded-lg border border-hairline bg-carriage p-3 transition-colors duration-150" in:fly={rowEntrance()}>
 	<details open={isOpen}>
-		<summary class="flex cursor-pointer items-center justify-between gap-3">
+		<summary class="flex items-center justify-between gap-3">
 			<span class="flex items-center gap-2.5">
 				{#if isRunning}
 					<Spinner class="size-3.5 text-caution" />

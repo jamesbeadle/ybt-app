@@ -29,8 +29,9 @@ describe('model ranges on this machine', () => {
 });
 
 describe('rangePhrase', () => {
-	it('says a range as points', () => {
+	it('says a range as points, and one size as that size alone', () => {
 		expect(rangePhrase({ leastPoints: 3, mostPoints: 8 })).toBe('3–8 points');
+		expect(rangePhrase({ leastPoints: 3, mostPoints: 3 })).toBe('3 points');
 	});
 
 	it('knows when two ranges are the same', () => {

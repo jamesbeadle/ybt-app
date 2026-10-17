@@ -2,7 +2,7 @@
 	import ActionButton from './ActionButton.svelte';
 	import Panel from './Panel.svelte';
 	import StatusLine from './StatusLine.svelte';
-	import { rememberedConnections } from '$lib/connections/connectionMemory.svelte';
+	import { hasAnsweredFor, rememberedConnections } from '$lib/connections/connectionMemory.svelte';
 	import { checkLmStudio, modelCountPhrase } from '$lib/connections/lmStudioConnection';
 	import { phaseOf } from '$lib/status/statusPhase';
 
@@ -11,11 +11,12 @@
 	const memory = rememberedConnections.lmStudio;
 	let isChecking = $state(false);
 
+	const hasAnswered = $derived(hasAnsweredFor(memory, lmStudioOrigin));
 	const servedModels = $derived(memory.models);
 	const servedCount = $derived(servedModels.length);
 	const hasProblem = $derived(memory.problem !== '');
 	const isServing = $derived(!hasProblem && servedCount > 0);
-	const phase = $derived(phaseOf(memory.hasAnswered, isServing));
+	const phase = $derived(phaseOf(hasAnswered, isServing));
 	const statusText = $derived.by(() => {
 		if (hasProblem) return `LM Studio is not answering at ${lmStudioOrigin}.`;
 		if (!isServing) return `LM Studio is running at ${lmStudioOrigin} but serving no models.`;
@@ -37,7 +38,7 @@
 </script>
 
 <Panel title="LM Studio">
-	{#if memory.hasAnswered}
+	{#if hasAnswered}
 		<StatusLine {phase} text={statusText} />
 		{#if hintText !== ''}<p class="mt-1 pl-5 text-sm text-mist">{hintText}</p>{/if}
 		{#if isServing}

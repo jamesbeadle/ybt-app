@@ -32,13 +32,11 @@ export function validateYbtModel(draft: YbtModelDraft): string | null {
 	return validateRange(draft);
 }
 
+export function trimmedDraft(draft: YbtModelDraft): YbtModelDraft {
+	return { ...draft, label: draft.label.trim(), runsOn: draft.runsOn.trim() };
+}
+
 /** Asks YBT to save the tier; YBT answers with a sentence saying what it now is, or why it refused. */
 export async function saveYbtModel(modelId: string, draft: YbtModelDraft): Promise<string> {
-	return performAction(saveAction, {
-		modelId,
-		label: draft.label.trim(),
-		runsOn: draft.runsOn.trim(),
-		leastPoints: draft.leastPoints,
-		mostPoints: draft.mostPoints
-	});
+	return performAction(saveAction, { modelId, ...trimmedDraft(draft) });
 }

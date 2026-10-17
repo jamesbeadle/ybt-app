@@ -18,6 +18,7 @@
 	--spacing-window-controls: 5.5rem;
 
 	--animate-breathe: breathe 1.6s ease-in-out infinite;
+	--animate-think: think 1s ease-in-out infinite;
 
 	@keyframes breathe {
 		0%,
@@ -28,9 +29,25 @@
 			opacity: 1;
 		}
 	}
+
+	@keyframes think {
+		0%,
+		100% {
+			transform: translateY(0);
+			opacity: 0.5;
+		}
+		50% {
+			transform: translateY(calc(var(--spacing) * -1));
+			opacity: 1;
+		}
+	}
 }
 
 @layer base {
+	html {
+		color-scheme: dark;
+	}
+
 	body {
 		background-color: var(--color-night);
 		color: var(--color-chalk);
@@ -38,7 +55,8 @@
 		-webkit-font-smoothing: antialiased;
 	}
 
-	button {
+	button,
+	summary {
 		cursor: pointer;
 	}
 
@@ -60,6 +78,7 @@
 		*::before,
 		*::after {
 			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
 			transition-duration: 0.01ms !important;
 		}
 	}
@@ -67,6 +86,6 @@
 
 @layer components {
 	.field {
-		@apply w-full rounded-lg border border-hairline bg-night px-3 py-2 text-chalk transition-colors duration-150 placeholder:text-mist hover:border-mist focus:border-signal focus:outline-none;
+		@apply w-full rounded-lg border border-hairline bg-night px-3 py-2 text-sm text-chalk transition-colors duration-150 placeholder:text-mist hover:border-mist focus:border-signal focus:outline-none;
 	}
 }
