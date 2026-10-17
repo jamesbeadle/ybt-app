@@ -38,7 +38,7 @@ export class ModelActivity {
 			(failure: unknown) => new Error(failureText(failure))
 		);
 		if (served instanceof Error) {
-			this.modelProblem = `LM Studio is not answering at ${this.lmStudioOrigin}: ${served.message}`;
+			this.modelProblem = served.message;
 			return;
 		}
 		this.modelProblem = '';

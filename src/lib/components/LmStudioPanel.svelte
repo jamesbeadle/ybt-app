@@ -3,7 +3,7 @@
 	import Panel from './Panel.svelte';
 	import StatusLine from './StatusLine.svelte';
 	import { hasAnsweredFor, rememberedConnections } from '$lib/connections/connectionMemory.svelte';
-	import { checkLmStudio, modelCountPhrase } from '$lib/connections/lmStudioConnection';
+	import { checkLmStudio, modelCountPhrase, notAnsweringPhrase, startServerHint } from '$lib/connections/lmStudioConnection';
 	import { phaseOf } from '$lib/status/statusPhase';
 
 	let { lmStudioOrigin }: { lmStudioOrigin: string } = $props();
@@ -18,12 +18,12 @@
 	const isServing = $derived(!hasProblem && servedCount > 0);
 	const phase = $derived(phaseOf(hasAnswered, isServing));
 	const statusText = $derived.by(() => {
-		if (hasProblem) return `LM Studio is not answering at ${lmStudioOrigin}.`;
+		if (hasProblem) return notAnsweringPhrase(lmStudioOrigin);
 		if (!isServing) return `LM Studio is running at ${lmStudioOrigin} but serving no models.`;
 		return `Serving ${modelCountPhrase(servedCount)} at ${lmStudioOrigin}.`;
 	});
 	const hintText = $derived.by(() => {
-		if (hasProblem) return `${memory.problem} Start its server in LM Studio's Developer tab.`;
+		if (hasProblem) return startServerHint(memory.problem);
 		if (!isServing) return 'Load a model in LM Studio first.';
 		return '';
 	});

@@ -1,9 +1,9 @@
 import { failureText } from '$lib/failures/failureText';
 import { readRangeOverrides, saveRangeOverrides } from '$lib/desktopStore';
-import { boardColumns, type BoardColumn } from './boardColumns';
+import { boardLayout, type BoardColumn, type BoardLayout } from './boardLayout';
 import { rangesOnThisMachine, type PointRange, type RangeOverrides } from './modelRanges';
 import { readBuildQueue } from './readBuildQueue';
-import { emptyBuildQueue, type BuildModel, type BuildQueue } from './buildQueue';
+import { emptyBuildQueue, type BuildModel, type BuildQueue, type BuildQueueEntry } from './buildQueue';
 
 export class BuildBoard {
 	queue = $state<BuildQueue>(emptyBuildQueue);
@@ -16,7 +16,9 @@ export class BuildBoard {
 	reviewModelId: string = $derived(this.queue.reviewModelId);
 	canEditModels: boolean = $derived(this.queue.canEditModels);
 	models: BuildModel[] = $derived(rangesOnThisMachine(this.ybtModels, this.overrides));
-	columns: BoardColumn[] = $derived(boardColumns(this.queue.tasks, this.models));
+	layout: BoardLayout = $derived(boardLayout(this.queue.tasks, this.models));
+	columns: BoardColumn[] = $derived(this.layout.columns);
+	unplacedTasks: BuildQueueEntry[] = $derived(this.layout.unplaced);
 
 	async load(): Promise<void> {
 		this.problem = '';

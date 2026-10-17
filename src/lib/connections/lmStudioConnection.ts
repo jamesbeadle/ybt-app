@@ -18,6 +18,14 @@ export function modelCountPhrase(count: number): string {
 	return `${count} models`;
 }
 
+export function notAnsweringPhrase(origin: string): string {
+	return `LM Studio is not answering at ${origin}.`;
+}
+
+export function startServerHint(problem: string): string {
+	return `${problem} Start its server in LM Studio's Developer tab.`;
+}
+
 function remember(origin: string, models: string[], problem: string): void {
 	const memory = rememberedConnections.lmStudio;
 	memory.origin = origin;

@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type { ChatModelChoice } from '$lib/lmStudio/chatModelChoice.svelte';
+	import { notAnsweringPhrase, startServerHint } from '$lib/connections/lmStudioConnection';
 
 	let { choice }: { choice: ChatModelChoice } = $props();
 </script>
 
 {#if choice.isNotAnswering}
 	<p class="mb-3 text-sm text-signal">
-		LM Studio is not answering at {choice.lmStudioOrigin}: {choice.problem} Start its server in LM Studio's Developer tab.
+		{notAnsweringPhrase(choice.lmStudioOrigin)} {startServerHint(choice.problem)}
 	</p>
 {:else if choice.isServingNone}
 	<p class="mb-3 text-sm text-caution">

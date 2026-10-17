@@ -4,18 +4,20 @@
 		value = $bindable(),
 		label,
 		labelOf = String,
+		disabled = false,
 		class: className = ''
 	}: {
 		choices: readonly Choice[];
 		value: Choice;
 		label: string;
 		labelOf?: (choice: Choice) => string;
+		disabled?: boolean;
 		class?: string;
 	} = $props();
 </script>
 
 <span class="relative inline-block {className}">
-	<select class="field appearance-none pr-9" aria-label={label} bind:value>
+	<select class="field appearance-none pr-9 disabled:cursor-not-allowed disabled:opacity-60" aria-label={label} {disabled} bind:value>
 		{#each choices as choice (choice)}
 			<option value={choice}>{labelOf(choice)}</option>
 		{/each}

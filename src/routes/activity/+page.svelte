@@ -6,7 +6,7 @@
 	import ServedModelRow from '$lib/components/ServedModelRow.svelte';
 	import StatusLine from '$lib/components/StatusLine.svelte';
 	import { ModelActivity, refreshSeconds } from '$lib/activity/modelActivity.svelte';
-	import { modelCountPhrase } from '$lib/connections/lmStudioConnection';
+	import { modelCountPhrase, notAnsweringPhrase, startServerHint } from '$lib/connections/lmStudioConnection';
 	import { phaseOf } from '$lib/status/statusPhase';
 	import type { PageProps } from './$types';
 
@@ -19,9 +19,10 @@
 	let modelPhase = $derived(phaseOf(activity.hasRefreshed, hasModelLoaded));
 	let modelText = $derived.by(() => {
 		if (!activity.hasRefreshed) return `Looking for LM Studio at ${settings.lmStudioOrigin}…`;
-		if (activity.modelProblem !== '') return activity.modelProblem;
+		if (activity.modelProblem !== '') return notAnsweringPhrase(settings.lmStudioOrigin);
 		return `LM Studio has ${modelCountPhrase(activity.loadedModelCount)} loaded.`;
 	});
+	let modelHint = $derived(activity.modelProblem === '' ? '' : startServerHint(activity.modelProblem));
 	let refreshedText = $derived(activity.refreshedAt === '' ? '' : `, last at ${activity.refreshedAt}`);
 
 	$effect(() => activity.follow());
@@ -29,6 +30,7 @@
 
 <Panel title="Running on this Mac">
 	<StatusLine phase={modelPhase} text={modelText} />
+	{#if modelHint !== ''}<p class="mt-1 pl-5 text-sm text-mist">{modelHint}</p>{/if}
 	<ul class="mt-2 grid gap-1">
 		{#each activity.models as model (model.id)}<ServedModelRow {model} />{/each}
 	</ul>

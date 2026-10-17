@@ -23,7 +23,7 @@
 	} = $props();
 
 	const kindClasses: Record<ButtonKind, string> = {
-		primary: 'bg-signal text-white shadow-sm shadow-signal/20 hover:brightness-110',
+		primary: 'border border-transparent bg-signal text-white shadow-sm shadow-signal/20 hover:brightness-110',
 		quiet: 'border border-hairline bg-transparent text-chalk hover:border-mist hover:bg-ink'
 	};
 

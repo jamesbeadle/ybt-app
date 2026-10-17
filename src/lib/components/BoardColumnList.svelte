@@ -1,6 +1,6 @@
 <script lang="ts">
 	import BoardColumnSection from './BoardColumnSection.svelte';
-	import type { BoardColumn } from '$lib/board/boardColumns';
+	import type { BoardColumn } from '$lib/board/boardLayout';
 
 	let { columns, reviewModelId }: { columns: BoardColumn[]; reviewModelId: string } = $props();
 </script>
