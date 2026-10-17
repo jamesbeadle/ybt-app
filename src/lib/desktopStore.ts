@@ -1,9 +1,10 @@
 import { load, type Store } from '@tauri-apps/plugin-store';
 import { defaultSettings, type DesktopSettings } from './settings/desktopSettings';
+import type { RangeOverrides } from './board/modelRanges';
 import type { YbtSession } from './ybt/ybtSession';
 
 const storeFile = 'ybt-desktop.json';
-const storeKeys = { settings: 'settings', session: 'session' } as const;
+const storeKeys = { settings: 'settings', session: 'session', rangeOverrides: 'rangeOverrides' } as const;
 
 function openStore(): Promise<Store> {
 	return load(storeFile, { autoSave: true, defaults: {} });
@@ -28,4 +29,14 @@ export async function readSession(): Promise<YbtSession | null> {
 export async function saveSession(session: YbtSession | null): Promise<void> {
 	const store = await openStore();
 	await store.set(storeKeys.session, session);
+}
+
+export async function readRangeOverrides(): Promise<RangeOverrides> {
+	const store = await openStore();
+	return (await store.get<RangeOverrides>(storeKeys.rangeOverrides)) ?? {};
+}
+
+export async function saveRangeOverrides(overrides: RangeOverrides): Promise<void> {
+	const store = await openStore();
+	await store.set(storeKeys.rangeOverrides, overrides);
 }
