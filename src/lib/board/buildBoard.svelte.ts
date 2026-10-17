@@ -1,3 +1,4 @@
+import { failureText } from '$lib/failures/failureText';
 import { readRangeOverrides, saveRangeOverrides } from '$lib/desktopStore';
 import { boardColumns, type BoardColumn } from './boardColumns';
 import { rangesOnThisMachine, type PointRange, type RangeOverrides } from './modelRanges';
@@ -21,7 +22,7 @@ export class BuildBoard {
 		this.problem = '';
 		this.isLoading = true;
 		this.overrides = await readRangeOverrides();
-		this.queue = await readBuildQueue().catch((failure: Error) => ((this.problem = failure.message), emptyQueue));
+		this.queue = await readBuildQueue().catch((failure: unknown) => ((this.problem = failureText(failure)), emptyQueue));
 		this.isLoading = false;
 	}
 

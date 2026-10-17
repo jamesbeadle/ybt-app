@@ -1,3 +1,4 @@
+import { failureText } from '$lib/failures/failureText';
 import { chatRoles, type ChatMessage, type ToolCall } from './chatMessages';
 
 export type TurnHelpers = {
@@ -23,7 +24,7 @@ export async function takeTurn(history: ChatMessage[], helpers: TurnHelpers): Pr
 async function answerToolCall(toolCall: ToolCall, helpers: TurnHelpers): Promise<ChatMessage> {
 	const { id, function: called } = toolCall;
 	const content = await runToolCall(called.name, called.arguments, helpers).catch(
-		(failure: Error) => `The tool failed: ${failure.message}`
+		(failure: unknown) => `The tool failed: ${failureText(failure)}`
 	);
 	return { role: 'tool', tool_call_id: id, content };
 }

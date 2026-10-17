@@ -1,3 +1,4 @@
+import { failureText } from '$lib/failures/failureText';
 import { fetch as desktopFetch } from '@tauri-apps/plugin-http';
 import { listServedModels, loadedFirst, type ServedModel } from '$lib/lmStudio/servedModels';
 import { readRecentSteps } from './readRecentSteps';
@@ -32,8 +33,8 @@ export class ModelActivity {
 
 	private async readModels(): Promise<void> {
 		this.modelProblem = '';
-		const served = await listServedModels(desktopFetch, this.lmStudioOrigin).catch((failure: Error) => {
-			this.modelProblem = `LM Studio is not answering at ${this.lmStudioOrigin}: ${failure.message}`;
+		const served = await listServedModels(desktopFetch, this.lmStudioOrigin).catch((failure: unknown) => {
+			this.modelProblem = `LM Studio is not answering at ${this.lmStudioOrigin}: ${failureText(failure)}`;
 			return [];
 		});
 		this.models = loadedFirst(served);
@@ -41,8 +42,8 @@ export class ModelActivity {
 
 	private async readSteps(): Promise<void> {
 		this.stepProblem = '';
-		this.steps = await readRecentSteps().catch((failure: Error) => {
-			this.stepProblem = `YBT did not answer: ${failure.message}`;
+		this.steps = await readRecentSteps().catch((failure: unknown) => {
+			this.stepProblem = `YBT did not answer: ${failureText(failure)}`;
 			return [];
 		});
 	}
