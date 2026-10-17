@@ -1,48 +1,64 @@
 <script lang="ts">
+	import ActionButton from './ActionButton.svelte';
 	import Panel from './Panel.svelte';
 	import StatusLine from './StatusLine.svelte';
-	import { readSession } from '$lib/desktopStore';
-	import { performAction } from '$lib/ybt/ybtConnector';
-	import { signInToYbt, signOutOfYbt } from '$lib/ybt/signIn';
+	import { hasAnsweredFor, rememberedConnections } from '$lib/connections/connectionMemory.svelte';
+	import { checkYbtAccount, confirmYbtAccount } from '$lib/connections/ybtConnection';
 	import { failureText } from '$lib/failures/failureText';
+	import { phaseOf } from '$lib/status/statusPhase';
+	import { signInToYbt, signOutOfYbt } from '$lib/ybt/signIn';
 
 	let { ybtOrigin }: { ybtOrigin: string } = $props();
 
-	let account = $state('');
-	let problem = $state('');
-	let isWorking = $state(false);
+	const memory = rememberedConnections.ybt;
+	let signInProblem = $state('');
+	let isSigningIn = $state(false);
+	let isSigningOut = $state(false);
 
-	async function readAccount() {
-		problem = '';
-		const session = await readSession();
-		if (session === null) return void (account = '');
-		account = await performAction('who_am_i').catch((failure: unknown) => ((problem = failureText(failure)), ''));
-	}
+	const hasAnswered = $derived(hasAnsweredFor(memory, ybtOrigin));
+	const account = $derived(memory.account);
+	const phase = $derived(phaseOf(hasAnswered, account !== null));
+	const statusText = $derived(
+		account === null ? `Not signed in to ${ybtOrigin}.` : `Signed in as ${account.email}`
+	);
+	const detailText = $derived(account === null ? '' : [account.standing, account.projects].filter(Boolean).join(' · '));
+	const problem = $derived(signInProblem === '' ? memory.problem : signInProblem);
 
 	async function signIn() {
-		isWorking = true;
-		await signInToYbt(ybtOrigin).catch((failure: unknown) => (problem = failureText(failure)));
-		isWorking = false;
-		await readAccount();
+		signInProblem = '';
+		isSigningIn = true;
+		await signInToYbt(ybtOrigin).catch((failure: unknown) => (signInProblem = failureText(failure)));
+		await confirmYbtAccount(ybtOrigin);
+		isSigningIn = false;
 	}
 
 	async function signOut() {
+		isSigningOut = true;
 		await signOutOfYbt();
-		await readAccount();
+		await confirmYbtAccount(ybtOrigin);
+		isSigningOut = false;
 	}
 
-	$effect(() => void readAccount());
+	$effect(() => void checkYbtAccount(ybtOrigin));
 </script>
 
 <Panel title="Your Business Today">
-	{#if account !== ''}
-		<StatusLine isGood={true} text={account} />
-		<button class="mt-3 rounded-lg border border-hairline px-3 py-1.5" onclick={signOut}>Sign out</button>
+	{#if hasAnswered}
+		<StatusLine {phase} text={statusText} />
+		{#if detailText !== ''}<p class="mt-1 pl-5 text-sm text-mist">{detailText}</p>{/if}
 	{:else}
-		<StatusLine isGood={false} text="Not signed in to {ybtOrigin}." />
-		<button class="mt-3 rounded-lg bg-signal px-3 py-1.5 font-medium" disabled={isWorking} onclick={signIn}>
-			{isWorking ? 'Waiting for the browser…' : 'Sign in to YBT'}
-		</button>
+		<StatusLine {phase} text="Checking your YBT sign-in…" />
 	{/if}
-	{#if problem !== ''}<p class="mt-2 text-signal">{problem}</p>{/if}
+	{#if problem !== ''}<p class="mt-2 text-sm text-signal">{problem}</p>{/if}
+	<div class="mt-4">
+		{#if !hasAnswered}
+			<ActionButton isBusy busyText="Checking…">Checking</ActionButton>
+		{:else if account === null}
+			<ActionButton kind="primary" isBusy={isSigningIn} busyText="Waiting for the browser…" onclick={signIn}>
+				Sign in to YBT
+			</ActionButton>
+		{:else}
+			<ActionButton isBusy={isSigningOut} busyText="Signing out…" onclick={signOut}>Sign out</ActionButton>
+		{/if}
+	</div>
 </Panel>

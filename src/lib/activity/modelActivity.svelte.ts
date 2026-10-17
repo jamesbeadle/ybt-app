@@ -13,6 +13,7 @@ export class ModelActivity {
 	modelProblem = $state('');
 	stepProblem = $state('');
 	refreshedAt = $state('');
+	hasRefreshed = $state(false);
 
 	loadedModelCount: number = $derived(this.models.filter((model) => model.isLoaded).length);
 	hasSteps: boolean = $derived(this.steps.length > 0);
@@ -22,6 +23,7 @@ export class ModelActivity {
 	async refresh(): Promise<void> {
 		await Promise.all([this.readModels(), this.readSteps()]);
 		this.refreshedAt = new Date().toLocaleTimeString();
+		this.hasRefreshed = true;
 	}
 
 	/** Refreshes now and every few seconds after; the returned function stops it. */
@@ -32,19 +34,24 @@ export class ModelActivity {
 	}
 
 	private async readModels(): Promise<void> {
+		const served = await listServedModels(desktopFetch, this.lmStudioOrigin).catch(
+			(failure: unknown) => new Error(failureText(failure))
+		);
+		if (served instanceof Error) {
+			this.modelProblem = served.message;
+			return;
+		}
 		this.modelProblem = '';
-		const served = await listServedModels(desktopFetch, this.lmStudioOrigin).catch((failure: unknown) => {
-			this.modelProblem = `LM Studio is not answering at ${this.lmStudioOrigin}: ${failureText(failure)}`;
-			return [];
-		});
 		this.models = loadedFirst(served);
 	}
 
 	private async readSteps(): Promise<void> {
+		const steps = await readRecentSteps().catch((failure: unknown) => new Error(failureText(failure)));
+		if (steps instanceof Error) {
+			this.stepProblem = `YBT did not answer: ${steps.message}`;
+			return;
+		}
 		this.stepProblem = '';
-		this.steps = await readRecentSteps().catch((failure: unknown) => {
-			this.stepProblem = `YBT did not answer: ${failureText(failure)}`;
-			return [];
-		});
+		this.steps = steps;
 	}
 }

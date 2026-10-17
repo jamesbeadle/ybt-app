@@ -15,9 +15,21 @@ export type BuildQueueEntry = {
 	heldBy: string | null;
 };
 
-export type BuildQueue = { models: BuildModel[]; reviewModelId: string; tasks: BuildQueueEntry[] };
+export type BuildQueue = {
+	models: BuildModel[];
+	reviewModelId: string;
+	canEditModels: boolean;
+	tasks: BuildQueueEntry[];
+};
+
+export const emptyBuildQueue: BuildQueue = { models: [], reviewModelId: '', canEditModels: false, tasks: [] };
 
 export function parseBuildQueue(answer: string): BuildQueue {
 	const parsed: Partial<BuildQueue> = JSON.parse(answer);
-	return { models: parsed.models ?? [], reviewModelId: parsed.reviewModelId ?? '', tasks: parsed.tasks ?? [] };
+	return {
+		models: parsed.models ?? emptyBuildQueue.models,
+		reviewModelId: parsed.reviewModelId ?? emptyBuildQueue.reviewModelId,
+		canEditModels: parsed.canEditModels ?? emptyBuildQueue.canEditModels,
+		tasks: parsed.tasks ?? emptyBuildQueue.tasks
+	};
 }

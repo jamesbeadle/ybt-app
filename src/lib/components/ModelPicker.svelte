@@ -1,10 +1,17 @@
 <script lang="ts">
+	import SelectField from './SelectField.svelte';
+
 	let { models, modelId = $bindable() }: { models: string[]; modelId: string } = $props();
+
+	const noModelChoice = 'No model loaded';
+	let hasModels = $derived(models.length > 0);
 </script>
 
-<label class="flex items-center gap-2 text-etch">
+<label class="flex items-center gap-2 text-sm text-etch">
 	<span>Local model</span>
-	<select class="rounded-lg border border-hairline bg-night px-2 py-1 text-chalk" bind:value={modelId}>
-		{#each models as model (model)}<option value={model}>{model}</option>{/each}
-	</select>
+	{#if hasModels}
+		<SelectField choices={models} bind:value={modelId} label="Local model" class="min-w-56" />
+	{:else}
+		<SelectField choices={[noModelChoice]} value={noModelChoice} label="Local model" class="min-w-56" disabled />
+	{/if}
 </label>

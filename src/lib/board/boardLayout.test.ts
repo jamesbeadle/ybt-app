@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { boardColumns } from './boardColumns';
+import { boardLayout } from './boardLayout';
 import type { BuildModel, BuildQueueEntry } from './buildQueue';
 
 const models: BuildModel[] = [
@@ -11,14 +11,15 @@ function task(title: string, storyPoints: number): BuildQueueEntry {
 	return { title, storyPoints, namedModelId: null } as BuildQueueEntry;
 }
 
-describe('boardColumns', () => {
+describe('boardLayout', () => {
 	it('puts each task under the model that takes it, keeping queue order', () => {
-		const columns = boardColumns([task('a', 2), task('b', 5), task('c', 1)], models);
+		const { columns } = boardLayout([task('a', 2), task('b', 5), task('c', 1)], models);
 		expect(columns.map((column) => column.tasks.map((entry) => entry.title))).toEqual([['a', 'c'], ['b']]);
 	});
 
-	it('adds a column for tasks no model takes', () => {
-		const columns = boardColumns([task('big', 21)], models);
-		expect(columns.at(-1)).toMatchObject({ model: null, tasks: [{ title: 'big' }] });
+	it('keeps the tasks no model takes apart from the columns', () => {
+		const { columns, unplaced } = boardLayout([task('big', 21)], models);
+		expect(columns.map((column) => column.tasks)).toEqual([[], []]);
+		expect(unplaced).toMatchObject([{ title: 'big' }]);
 	});
 });

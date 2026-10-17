@@ -7,7 +7,7 @@
 	let standing = $derived(taskStanding(task));
 </script>
 
-<article class="rounded-lg border border-hairline bg-night p-3">
+<article class="rounded-lg border border-hairline bg-night p-3 transition-colors duration-150 hover:border-mist">
 	<h3 class="font-medium">{task.title}</h3>
 	<p class="text-sm text-etch">{taskPlaceLine(task)}</p>
 	<p class="mt-1 text-sm {standing.isFree ? 'text-go' : 'text-caution'}">{standing.sentence}</p>

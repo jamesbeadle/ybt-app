@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { modelTakingTask, rangesOnThisMachine, validateRange } from './modelRanges';
+import { isSameRange, modelTakingTask, rangePhrase, rangesOnThisMachine, validateRange } from './modelRanges';
 import type { BuildModel, BuildQueueEntry } from './buildQueue';
 
 const models: BuildModel[] = [
@@ -25,5 +25,17 @@ describe('model ranges on this machine', () => {
 		expect(validateRange({ leastPoints: 4, mostPoints: 8 })).toContain('on the scale');
 		expect(validateRange({ leastPoints: 8, mostPoints: 3 })).toContain('not be more');
 		expect(validateRange({ leastPoints: 1, mostPoints: 3 })).toBeNull();
+	});
+});
+
+describe('rangePhrase', () => {
+	it('says a range as points, and one size as that size alone', () => {
+		expect(rangePhrase({ leastPoints: 3, mostPoints: 8 })).toBe('3–8 points');
+		expect(rangePhrase({ leastPoints: 3, mostPoints: 3 })).toBe('3 points');
+	});
+
+	it('knows when two ranges are the same', () => {
+		expect(isSameRange({ leastPoints: 1, mostPoints: 2 }, { leastPoints: 1, mostPoints: 2 })).toBe(true);
+		expect(isSameRange({ leastPoints: 1, mostPoints: 2 }, { leastPoints: 1, mostPoints: 3 })).toBe(false);
 	});
 });

@@ -1,29 +1,34 @@
 import { failureText } from '$lib/failures/failureText';
 import { readRangeOverrides, saveRangeOverrides } from '$lib/desktopStore';
-import { boardColumns, type BoardColumn } from './boardColumns';
+import { boardLayout, type BoardColumn, type BoardLayout } from './boardLayout';
 import { rangesOnThisMachine, type PointRange, type RangeOverrides } from './modelRanges';
 import { readBuildQueue } from './readBuildQueue';
-import type { BuildModel, BuildQueue } from './buildQueue';
-
-const emptyQueue: BuildQueue = { models: [], reviewModelId: '', tasks: [] };
+import { emptyBuildQueue, type BuildModel, type BuildQueue, type BuildQueueEntry } from './buildQueue';
 
 export class BuildBoard {
-	queue = $state<BuildQueue>(emptyQueue);
+	queue = $state<BuildQueue>(emptyBuildQueue);
 	overrides = $state<RangeOverrides>({});
 	problem = $state('');
 	isLoading = $state(true);
+	hasLoaded = $state(false);
 
 	ybtModels: BuildModel[] = $derived(this.queue.models);
 	reviewModelId: string = $derived(this.queue.reviewModelId);
+	canEditModels: boolean = $derived(this.queue.canEditModels);
 	models: BuildModel[] = $derived(rangesOnThisMachine(this.ybtModels, this.overrides));
-	columns: BoardColumn[] = $derived(boardColumns(this.queue.tasks, this.models));
+	layout: BoardLayout = $derived(boardLayout(this.queue.tasks, this.models));
+	columns: BoardColumn[] = $derived(this.layout.columns);
+	unplacedTasks: BuildQueueEntry[] = $derived(this.layout.unplaced);
 
 	async load(): Promise<void> {
 		this.problem = '';
 		this.isLoading = true;
 		this.overrides = await readRangeOverrides();
-		this.queue = await readBuildQueue().catch((failure: unknown) => ((this.problem = failureText(failure)), emptyQueue));
+		this.queue = await readBuildQueue().catch(
+			(failure: unknown) => ((this.problem = failureText(failure)), emptyBuildQueue)
+		);
 		this.isLoading = false;
+		this.hasLoaded = true;
 	}
 
 	async setRange(modelId: string, range: PointRange): Promise<void> {

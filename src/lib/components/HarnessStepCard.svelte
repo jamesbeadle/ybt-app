@@ -1,20 +1,33 @@
 <script lang="ts">
-	import { stepStates, type HarnessStepView } from '$lib/harness/harnessEvents';
+	import { fly } from 'svelte/transition';
+	import { rowEntrance } from '$lib/motion/entrances';
+	import { stepStates, type HarnessStepView, type StepState } from '$lib/harness/harnessEvents';
+	import Spinner from './Spinner.svelte';
 
 	let { step }: { step: HarnessStepView } = $props();
 
-	const stateWords = { running: 'Running', passed: 'Passed', failed: 'Failed' };
-	const stateColours = { running: 'text-caution', passed: 'text-go', failed: 'text-signal' };
+	const stateWords: Record<StepState, string> = { running: 'Running', passed: 'Passed', failed: 'Failed' };
+	const stateColours: Record<StepState, string> = { running: 'text-caution', passed: 'text-go', failed: 'text-signal' };
+	const dotColours: Record<StepState, string> = { running: 'bg-caution', passed: 'bg-go', failed: 'bg-signal' };
 
 	let isRunning = $derived(step.state === stepStates.running);
+	let isOpen = $derived(isRunning || step.state === stepStates.failed);
+	let outcome = $derived(isRunning ? stateWords.running : `${stateWords[step.state]} in ${step.seconds}s`);
 </script>
 
-<li class="rounded-lg border border-hairline p-3">
-	<details open={isRunning || step.state === stepStates.failed}>
-		<summary class="flex cursor-pointer justify-between gap-3">
-			<span>{step.title}</span>
-			<span class={stateColours[step.state]}>{stateWords[step.state]}{isRunning ? '' : ` in ${step.seconds}s`}</span>
+<li class="rounded-lg border border-hairline bg-carriage p-3 transition-colors duration-150" in:fly={rowEntrance()}>
+	<details open={isOpen}>
+		<summary class="flex items-center justify-between gap-3">
+			<span class="flex items-center gap-2.5">
+				{#if isRunning}
+					<Spinner class="size-3.5 text-caution" />
+				{:else}
+					<span class="size-2.5 rounded-full {dotColours[step.state]}"></span>
+				{/if}
+				<span>{step.title}</span>
+			</span>
+			<span class="text-sm {stateColours[step.state]}">{outcome}</span>
 		</summary>
-		<pre class="mt-2 max-h-96 overflow-auto text-sm whitespace-pre-wrap text-etch">{step.lines.join('\n')}</pre>
+		<pre class="mt-3 max-h-96 overflow-auto rounded-lg bg-night p-3 text-sm whitespace-pre-wrap text-etch">{step.lines.join('\n')}</pre>
 	</details>
 </li>

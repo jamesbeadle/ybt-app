@@ -1,0 +1,19 @@
+<script lang="ts">
+	let { class: className = 'size-7' }: { class?: string } = $props();
+</script>
+
+<svg class={className} viewBox="0 0 48 48" aria-hidden="true">
+	<rect width="48" height="48" rx="12" class="fill-carriage" />
+	<g transform="translate(13.44 0)">
+		<path
+			class="fill-chalk"
+			d="M6.4 33.1L6.4 26.83L0.21 14.9L4.03 14.9L7.88 22.7L8.35 22.7L12.19 14.9L16.02 14.9L9.83 26.83L9.83 33.1Z"
+		/>
+		<path
+			class="fill-signal"
+			d="M17.26 33.46Q16.2 33.46 15.48 32.78Q14.77 32.09 14.77 30.99Q14.77 29.9 15.48 29.21
+				Q16.2 28.52 17.26 28.52Q18.3 28.52 19.01 29.21Q19.71 29.9 19.71 30.99Q19.71 32.09 19.01 32.78
+				Q18.3 33.46 17.26 33.46Z"
+		/>
+	</g>
+</svg>

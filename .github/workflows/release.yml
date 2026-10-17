@@ -39,6 +39,6 @@ jobs:
         with:
           tagName: ${{ github.ref_type == 'tag' && github.ref_name || 'v__VERSION__' }}
           releaseName: YBT App v__VERSION__
-          releaseBody: Unsigned builds. On a Mac, right-click the app and choose Open the first time.
+          releaseBody: "Unsigned build. After copying the app to Applications, run `xattr -cr \"/Applications/YBT Desktop.app\"` in Terminal once, then open it."
           releaseDraft: false
           args: ${{ matrix.tauri-args }}

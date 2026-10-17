@@ -1,24 +1,22 @@
 <script lang="ts">
 	import BoardTaskCard from './BoardTaskCard.svelte';
 	import type { BuildModel, BuildQueueEntry } from '$lib/board/buildQueue';
+	import { rangePhrase } from '$lib/board/modelRanges';
 
-	let {
-		model,
-		tasks,
-		reviewModelId
-	}: { model: BuildModel | null; tasks: BuildQueueEntry[]; reviewModelId: string } = $props();
+	let { model, tasks, reviewModelId }: { model: BuildModel; tasks: BuildQueueEntry[]; reviewModelId: string } = $props();
+
+	let isReviewer = $derived(model.modelId === reviewModelId);
+	let roleText = $derived(isReviewer ? ' · reviews' : '');
 </script>
 
 <section class="grid content-start gap-3">
-	{#if model}
-		<h2 class="font-display font-medium">
-			{model.label}
-			<span class="text-sm text-etch">
-				{model.leastPoints}–{model.mostPoints} points{model.modelId === reviewModelId ? ' · reviews' : ''}
-			</span>
-		</h2>
+	<h2 class="font-display font-medium">
+		{model.label}
+		<span class="block text-sm font-normal text-etch">{rangePhrase(model)}{roleText}</span>
+	</h2>
+	{#each tasks as task (task.taskId)}
+		<BoardTaskCard {task} />
 	{:else}
-		<h2 class="font-display font-medium text-caution">No model takes these</h2>
-	{/if}
-	{#each tasks as task (task.taskId)}<BoardTaskCard {task} />{:else}<p class="text-sm text-etch">Nothing waiting.</p>{/each}
+		<p class="rounded-lg border border-dashed border-hairline px-3 py-4 text-center text-sm text-mist">Nothing waiting.</p>
+	{/each}
 </section>
