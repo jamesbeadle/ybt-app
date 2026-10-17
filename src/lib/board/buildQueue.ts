@@ -1,4 +1,4 @@
-export type BuildModel = { modelId: string; label: string; leastPoints: number; mostPoints: number };
+export type BuildModel = { modelId: string; label: string; runsOn?: string; leastPoints: number; mostPoints: number };
 
 export type BuildQueueEntry = {
 	taskId: string;

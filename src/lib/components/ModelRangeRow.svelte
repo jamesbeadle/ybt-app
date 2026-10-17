@@ -20,7 +20,10 @@
 </script>
 
 <tr class="border-t border-hairline">
-	<td class="py-2">{ybtModel.label}</td>
+	<td class="py-2">
+		{ybtModel.label}
+		{#if ybtModel.runsOn}<span class="block text-sm text-etch">Runs on {ybtModel.runsOn}</span>{/if}
+	</td>
 	<td class="text-etch">{ybtModel.leastPoints}–{ybtModel.mostPoints}</td>
 	<td>
 		<select class="rounded border border-hairline bg-night px-1" bind:value={draft.leastPoints}>
