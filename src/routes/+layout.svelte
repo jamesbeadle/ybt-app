@@ -6,6 +6,7 @@
 
 	const sections = [
 		{ href: '/', label: 'Connections' },
+		{ href: '/chat', label: 'Chat' },
 		{ href: '/settings', label: 'Settings' }
 	];
 </script>
