@@ -4,13 +4,15 @@ import { fetch as desktopFetch } from '@tauri-apps/plugin-http';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { saveSession } from '$lib/desktopStore';
 import { authorizeUrl, exchangeCode, registerClient } from './oauthClient';
+import { discoverYbtOrigin } from './oauthDiscovery';
 import { redirectPath } from './oauthPaths';
 import { createPkcePair, createState } from './pkce';
 import { readRedirect } from './redirectResult';
 
 const redirectEvent = 'sign-in-redirect';
 
-export async function signInToYbt(ybtOrigin: string): Promise<void> {
+export async function signInToYbt(configuredOrigin: string): Promise<void> {
+	const ybtOrigin = await discoverYbtOrigin(desktopFetch, configuredOrigin);
 	const port = await invoke<number>('start_sign_in_listener');
 	const redirectUri = `http://127.0.0.1:${port}${redirectPath}`;
 	const redirectArrival = nextRedirect();

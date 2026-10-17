@@ -4,6 +4,7 @@
 	import { readSession } from '$lib/desktopStore';
 	import { performAction } from '$lib/ybt/ybtConnector';
 	import { signInToYbt, signOutOfYbt } from '$lib/ybt/signIn';
+	import { failureText } from '$lib/failures/failureText';
 
 	let { ybtOrigin }: { ybtOrigin: string } = $props();
 
@@ -15,12 +16,12 @@
 		problem = '';
 		const session = await readSession();
 		if (session === null) return void (account = '');
-		account = await performAction('who_am_i').catch((failure: Error) => ((problem = failure.message), ''));
+		account = await performAction('who_am_i').catch((failure: unknown) => ((problem = failureText(failure)), ''));
 	}
 
 	async function signIn() {
 		isWorking = true;
-		await signInToYbt(ybtOrigin).catch((failure: Error) => (problem = failure.message));
+		await signInToYbt(ybtOrigin).catch((failure: unknown) => (problem = failureText(failure)));
 		isWorking = false;
 		await readAccount();
 	}

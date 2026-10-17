@@ -3,6 +3,7 @@
 	import Panel from './Panel.svelte';
 	import StatusLine from './StatusLine.svelte';
 	import { listLocalModels } from '$lib/lmStudio/lmStudio';
+	import { failureText } from '$lib/failures/failureText';
 
 	let { lmStudioOrigin }: { lmStudioOrigin: string } = $props();
 
@@ -11,8 +12,8 @@
 
 	async function readModels() {
 		problem = '';
-		models = await listLocalModels(desktopFetch, lmStudioOrigin).catch((failure: Error) => {
-			problem = `LM Studio is not answering at ${lmStudioOrigin}: ${failure.message}`;
+		models = await listLocalModels(desktopFetch, lmStudioOrigin).catch((failure: unknown) => {
+			problem = `LM Studio is not answering at ${lmStudioOrigin}: ${failureText(failure)}. Start its server in LM Studio's Developer tab.`;
 			return [];
 		});
 	}

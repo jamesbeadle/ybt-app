@@ -32,7 +32,7 @@ async function sendRequest(method: string, params: Record<string, unknown>): Pro
 		headers: { 'content-type': 'application/json', authorization: `Bearer ${session.accessToken}` },
 		body: JSON.stringify(request)
 	});
-	if (!response.ok) throw new Error(`YBT answered ${response.status}. Sign in again if it persists.`);
+	if (!response.ok) throw new Error(`YBT answered ${response.status} at ${response.url}. Sign in again if it persists.`);
 	return response.json();
 }
 

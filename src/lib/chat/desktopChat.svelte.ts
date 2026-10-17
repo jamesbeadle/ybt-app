@@ -1,3 +1,4 @@
+import { failureText } from '$lib/failures/failureText';
 import { fetch as desktopFetch } from '@tauri-apps/plugin-http';
 import { requestCompletion } from '$lib/lmStudio/chatCompletion';
 import { callTool, listTools } from '$lib/ybt/ybtConnector';
@@ -17,7 +18,7 @@ export class DesktopChat {
 	async send(text: string, modelId: string): Promise<void> {
 		this.problem = '';
 		this.isThinking = true;
-		await this.#answer(text, modelId).catch((failure: Error) => (this.problem = failure.message));
+		await this.#answer(text, modelId).catch((failure: unknown) => (this.problem = failureText(failure)));
 		this.isThinking = false;
 	}
 
