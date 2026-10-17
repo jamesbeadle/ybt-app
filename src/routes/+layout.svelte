@@ -8,6 +8,7 @@
 		{ href: '/', label: 'Connections' },
 		{ href: '/chat', label: 'Chat' },
 		{ href: '/board', label: 'Board' },
+		{ href: '/test', label: 'Local test' },
 		{ href: '/settings', label: 'Settings' }
 	];
 </script>
