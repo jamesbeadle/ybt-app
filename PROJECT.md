@@ -6,7 +6,7 @@ The project-process kit writes this file once and never touches it again, and `C
 
 ## What this repository is
 
-**YBT Desktop**: the macOS app on the office Mac mini (M5 Pro, 64 GB) that puts Your Business Today and the local model side by side. James talks to the local model to manage YBT, sees the board of buildable work with the story point range each model takes, and the local builder builds easy tasks on a branch and hands them to the review model. Its tasks live on the **YBT Desktop** project in YBT, under the goal *Improve the Entire Project Process* on the YourBusinessToday project.
+**YBT Desktop** (repository jamesbeadle/ybt-app): one Tauri app meant for every device James uses, built for the Mac first, on the office Mac mini (M5 Pro, 64 GB). It puts Your Business Today and the local model side by side. James talks to the local model to manage YBT, sees the board of buildable work with the story point range each model takes, and the local builder builds easy tasks on a branch and hands them to the review model. Its tasks live on the **YBT Desktop** project in YBT, under the goal *Improve the Entire Project Process* on the YourBusinessToday project.
 
 - **Stack:** Tauri 2 with SvelteKit (Svelte 5 runes, Tailwind 4, `adapter-static` as a single-page app). The Rust shell in `src-tauri/` stays thin: plugins for HTTP, the browser opener and the settings store, and the one-shot loopback listener YBT's sign-in redirects to (`sign_in_redirect.rs`). Everything else is TypeScript in `src/lib/`.
 - **YBT** is reached through its MCP connector at `<YBT address>/api/mcp`, stateless JSON-RPC with a bearer token. The app signs in with OAuth (dynamic client registration as a public client, PKCE S256, a loopback redirect on a free port), keeps the session in the store and refreshes it a minute before it expires. Writes go through `perform_action`, so they are recorded under the signed-in person, exactly as on the site.
@@ -16,5 +16,6 @@ The project-process kit writes this file once and never touches it again, and `C
 ## Commands
 
 - `npm install`, then `npm run tauri dev` on the Mac to run the app; `npm run tauri build` for the `.app` and `.dmg`.
+- Releases: `.github/workflows/release.yml` builds each platform on GitHub and attaches it to a release, on a `v*` tag or by hand from the Actions tab. Its matrix holds the Mac alone for now; Windows, Linux, iOS and Android are each one more matrix entry, and nothing in the front end may assume macOS. The local builder needs LM Studio, so it stays on the Mac mini whatever devices carry the app. Builds are unsigned until the Apple developer enrolment lands.
 - `npm run check`, `npm test`, `npm run build` — the front end's checks, as CI runs them.
 - `cargo check --manifest-path src-tauri/Cargo.toml` — the shell compiles (on Linux it needs `libwebkit2gtk-4.1-dev`; CI installs it).
