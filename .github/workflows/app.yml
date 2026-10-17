@@ -1,0 +1,35 @@
+name: Check the app
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  front-end:
+    runs-on: ubuntu-latest
+    name: Check, test and build the front end
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+
+  shell:
+    runs-on: ubuntu-latest
+    name: Check the Tauri shell compiles
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the webview libraries
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev librsvg2-dev
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - name: Stand in for the built front end
+        run: mkdir -p build && echo '<!doctype html>' > build/index.html
+      - run: cargo check --manifest-path src-tauri/Cargo.toml
