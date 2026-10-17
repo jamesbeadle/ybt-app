@@ -4,7 +4,7 @@ import type { RangeOverrides } from './board/modelRanges';
 import type { YbtSession } from './ybt/ybtSession';
 
 const storeFile = 'ybt-desktop.json';
-const storeKeys = { settings: 'settings', session: 'session', rangeOverrides: 'rangeOverrides' } as const;
+const storeKeys = { settings: 'settings', session: 'session', rangeOverrides: 'rangeOverrides', harnessCheckout: 'harnessCheckout' } as const;
 
 function openStore(): Promise<Store> {
 	return load(storeFile, { autoSave: true, defaults: {} });
@@ -39,4 +39,14 @@ export async function readRangeOverrides(): Promise<RangeOverrides> {
 export async function saveRangeOverrides(overrides: RangeOverrides): Promise<void> {
 	const store = await openStore();
 	await store.set(storeKeys.rangeOverrides, overrides);
+}
+
+export async function readHarnessCheckout(): Promise<string> {
+	const store = await openStore();
+	return (await store.get<string>(storeKeys.harnessCheckout)) ?? '';
+}
+
+export async function saveHarnessCheckout(checkout: string): Promise<void> {
+	const store = await openStore();
+	await store.set(storeKeys.harnessCheckout, checkout);
 }
