@@ -1,0 +1,621 @@
+{
+  "generatedAt": "2026-10-17T09:06:16+00:00",
+  "kitVersion": "1.23.0",
+  "score": {
+    "overall": 100.0,
+    "groups": [
+      {
+        "group": "Standard baseline checks",
+        "score": 100.0,
+        "weight": 60
+      },
+      {
+        "group": "Design pattern file count",
+        "score": null,
+        "weight": 0
+      },
+      {
+        "group": "Prose",
+        "score": 100.0,
+        "weight": 20
+      },
+      {
+        "group": "Widget adoption",
+        "score": null,
+        "weight": 0
+      },
+      {
+        "group": "Input validation",
+        "score": null,
+        "weight": 0
+      }
+    ],
+    "elements": [
+      {
+        "key": "filesOverLimit",
+        "label": "Files over the line limit",
+        "group": "Standard baseline checks",
+        "weight": 10,
+        "zeroAt": 0.5,
+        "unit": "files",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 27,
+        "score": 100.0
+      },
+      {
+        "key": "worstFile",
+        "label": "Worst file, in limits over",
+        "group": "Standard baseline checks",
+        "weight": 5,
+        "zeroAt": 9,
+        "unit": "",
+        "isMeasured": true,
+        "offenders": 0.0,
+        "measuredAgainst": 1,
+        "score": 100.0
+      },
+      {
+        "key": "functionsOverLimit",
+        "label": "Functions over the line limit",
+        "group": "Standard baseline checks",
+        "weight": 8,
+        "zeroAt": 0.25,
+        "unit": "functions",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 34,
+        "score": 100.0
+      },
+      {
+        "key": "elseBlocks",
+        "label": "Else blocks",
+        "group": "Standard baseline checks",
+        "weight": 5,
+        "zeroAt": 0.5,
+        "unit": "branches",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 21,
+        "score": 100.0
+      },
+      {
+        "key": "duplication",
+        "label": "Duplication %",
+        "group": "Standard baseline checks",
+        "weight": 8,
+        "zeroAt": 20,
+        "unit": "",
+        "isMeasured": true,
+        "offenders": 0.0,
+        "measuredAgainst": 1,
+        "score": 100.0
+      },
+      {
+        "key": "comments",
+        "label": "Explanatory comment lines",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 50,
+        "unit": "thousand lines",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 0.61,
+        "score": 100.0
+      },
+      {
+        "key": "magicValues",
+        "label": "Inline magic values",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 20,
+        "unit": "thousand lines",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 0.61,
+        "score": 100.0
+      },
+      {
+        "key": "orphans",
+        "label": "Orphan components and functions",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 0.1,
+        "unit": "components and functions",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 39,
+        "score": 100.0
+      },
+      {
+        "key": "memberChains",
+        "label": "Long member chain lines",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 30,
+        "unit": "thousand lines",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 0.61,
+        "score": 100.0
+      },
+      {
+        "key": "deepIndentation",
+        "label": "Deeply indented lines",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 30,
+        "unit": "thousand lines",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 0.61,
+        "score": 100.0
+      },
+      {
+        "key": "functionNames",
+        "label": "Overlong function names",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 0.1,
+        "unit": "functions",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 34,
+        "score": 100.0
+      },
+      {
+        "key": "predictedFiles",
+        "label": "Files the patterns predict but are missing",
+        "group": "Design pattern file count",
+        "weight": 10,
+        "zeroAt": 0.5,
+        "unit": "predicted files",
+        "isMeasured": false,
+        "offenders": 0,
+        "score": null
+      },
+      {
+        "key": "entityFileCounts",
+        "label": "Entities outside their expected file count",
+        "group": "Design pattern file count",
+        "weight": 10,
+        "zeroAt": 0.5,
+        "unit": "entities",
+        "isMeasured": false,
+        "offenders": 0,
+        "score": null
+      },
+      {
+        "key": "tangledConditions",
+        "label": "Conditions with calls tangled inside calls",
+        "group": "Prose",
+        "weight": 8,
+        "zeroAt": 0.25,
+        "unit": "branches",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 21,
+        "score": 100.0
+      },
+      {
+        "key": "literalComparisons",
+        "label": "Conditions compared to a raw literal",
+        "group": "Prose",
+        "weight": 6,
+        "zeroAt": 0.25,
+        "unit": "branches",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 21,
+        "score": 100.0
+      },
+      {
+        "key": "gluedAccessors",
+        "label": "Accessor names that want to be a property",
+        "group": "Prose",
+        "weight": 6,
+        "zeroAt": 0.1,
+        "unit": "functions",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 34,
+        "score": 100.0
+      },
+      {
+        "key": "handRolledWidgets",
+        "label": "Markup written by hand where a widget should be",
+        "group": "Widget adoption",
+        "weight": 8,
+        "zeroAt": 0.5,
+        "unit": "widget slots",
+        "isMeasured": false,
+        "offenders": null,
+        "score": null
+      },
+      {
+        "key": "unvalidatedWrites",
+        "label": "Doors that write without checking their input against the columns",
+        "group": "Input validation",
+        "weight": 8,
+        "zeroAt": 0.5,
+        "unit": "write doors",
+        "isMeasured": false,
+        "offenders": 0,
+        "score": null
+      }
+    ]
+  },
+  "summaries": {
+    "fileLength": {
+      "limit": 100,
+      "filesOverLimit": 0,
+      "totalFiles": 27,
+      "totalLines": 612,
+      "worstFileLines": 0,
+      "worstFileTimesOverLimit": 0.0
+    },
+    "functionShape": {
+      "limit": 30,
+      "functionsOverLimit": 0,
+      "totalFunctions": 34,
+      "elseBlocks": 0,
+      "ifBlocks": 21,
+      "measurementIsHeuristic": true
+    },
+    "functionNames": {
+      "overlongFunctionNames": 0,
+      "maxWords": 5,
+      "maxLength": 40
+    },
+    "accessorNames": {
+      "gluedAccessorNames": 0,
+      "measurementIsHeuristic": true
+    },
+    "duplication": {
+      "clones": 0,
+      "duplicatedLines": 0,
+      "totalLines": 590,
+      "duplicatedPercentage": 0.0
+    },
+    "naming": {
+      "bannedAbbreviationHits": 0,
+      "unprefixedBooleans": 2
+    },
+    "comments": {
+      "explanatoryCommentLines": 0,
+      "filesWithComments": 0,
+      "taskMarkers": 0
+    },
+    "magicValues": {
+      "inlineHexColours": 0,
+      "inlineStyleAttributes": 0,
+      "repeatedStringLiterals": 0
+    },
+    "prose": {
+      "longMemberChainLines": 0,
+      "deeplyIndentedLines": 0,
+      "overlongLines": 0,
+      "measurementIsHeuristic": true
+    },
+    "conditions": {
+      "tangledConditionLines": 0,
+      "literalComparisonLines": 0,
+      "measurementIsHeuristic": true
+    },
+    "orphans": {
+      "orphanFunctions": 0,
+      "functionsExamined": 34
+    },
+    "designPatterns": {
+      "roleFamilies": 1,
+      "predictedFiles": 0,
+      "predictedFilesMissing": 0,
+      "entities": 0,
+      "entitiesOutOfRange": 0,
+      "measurementIsHeuristic": true
+    },
+    "inventory": {
+      "pages": 2,
+      "components": 5,
+      "orphanComponents": 0,
+      "averagePageLines": 10
+    },
+    "siteDefinition": {
+      "skipped": "no siteDefinition catalogue in rules.json"
+    },
+    "inputValidation": {
+      "schemaTables": 0,
+      "limitedColumns": 0,
+      "writeDoors": 0,
+      "unvalidatedDoors": 0,
+      "looserLimits": 0
+    },
+    "fileAreas": {
+      "totalFiles": 3643,
+      "other": 2825,
+      "infrastructure": 622,
+      "tooling": 144,
+      "docs": 15,
+      "shared": 14,
+      "tests": 13,
+      "frontend": 10
+    }
+  },
+  "details": {
+    "fileLength": {
+      "name": "fileLength",
+      "summary": {
+        "limit": 100,
+        "filesOverLimit": 0,
+        "totalFiles": 27,
+        "totalLines": 612,
+        "worstFileLines": 0,
+        "worstFileTimesOverLimit": 0.0
+      },
+      "offenders": []
+    },
+    "functionShape": {
+      "name": "functionShape",
+      "summary": {
+        "limit": 30,
+        "functionsOverLimit": 0,
+        "totalFunctions": 34,
+        "elseBlocks": 0,
+        "ifBlocks": 21,
+        "measurementIsHeuristic": true
+      },
+      "offenders": []
+    },
+    "functionNames": {
+      "name": "functionNames",
+      "summary": {
+        "overlongFunctionNames": 0,
+        "maxWords": 5,
+        "maxLength": 40
+      },
+      "offenders": []
+    },
+    "accessorNames": {
+      "name": "accessorNames",
+      "summary": {
+        "gluedAccessorNames": 0,
+        "measurementIsHeuristic": true
+      },
+      "offenders": []
+    },
+    "naming": {
+      "name": "naming",
+      "summary": {
+        "bannedAbbreviationHits": 0,
+        "unprefixedBooleans": 2
+      },
+      "offenders": {
+        "abbreviations": [],
+        "booleans": [
+          {
+            "file": "src/routes/+layout.ts",
+            "line": 4,
+            "name": "ssr"
+          },
+          {
+            "file": "src/routes/+layout.ts",
+            "line": 5,
+            "name": "prerender"
+          }
+        ]
+      }
+    },
+    "comments": {
+      "name": "comments",
+      "summary": {
+        "explanatoryCommentLines": 0,
+        "filesWithComments": 0,
+        "taskMarkers": 0
+      },
+      "offenders": []
+    },
+    "magicValues": {
+      "name": "magicValues",
+      "summary": {
+        "inlineHexColours": 0,
+        "inlineStyleAttributes": 0,
+        "repeatedStringLiterals": 0
+      },
+      "offenders": {
+        "hexColours": [],
+        "inlineStyles": [],
+        "repeatedLiterals": []
+      }
+    },
+    "prose": {
+      "name": "prose",
+      "summary": {
+        "longMemberChainLines": 0,
+        "deeplyIndentedLines": 0,
+        "overlongLines": 0,
+        "measurementIsHeuristic": true
+      },
+      "offenders": {
+        "memberChains": [],
+        "deepIndentation": [],
+        "overlongLines": []
+      }
+    },
+    "conditions": {
+      "name": "conditions",
+      "summary": {
+        "tangledConditionLines": 0,
+        "literalComparisonLines": 0,
+        "measurementIsHeuristic": true
+      },
+      "offenders": {
+        "tangled": [],
+        "literalComparisons": []
+      }
+    },
+    "orphans": {
+      "name": "orphans",
+      "summary": {
+        "orphanFunctions": 0,
+        "functionsExamined": 34
+      },
+      "offenders": []
+    },
+    "designPatterns": {
+      "name": "designPatterns",
+      "summary": {
+        "roleFamilies": 1,
+        "predictedFiles": 0,
+        "predictedFilesMissing": 0,
+        "entities": 0,
+        "entitiesOutOfRange": 0,
+        "measurementIsHeuristic": true
+      },
+      "offenders": {
+        "roleFamilies": {
+          "test": 6
+        },
+        "patterns": [],
+        "missingPredictedFiles": [],
+        "entityFileCounts": []
+      }
+    },
+    "inventory": {
+      "name": "inventory",
+      "summary": {
+        "pages": 2,
+        "components": 5,
+        "orphanComponents": 0,
+        "averagePageLines": 10
+      },
+      "offenders": {
+        "pages": [
+          {
+            "page": "src/routes/+page.svelte",
+            "lines": 11,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/settings/+page.svelte",
+            "lines": 8,
+            "widgets": []
+          }
+        ],
+        "componentReuse": [
+          {
+            "component": "src/lib/components/Panel.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/StatusLine.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/LmStudioPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/SettingsForm.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/YbtConnectionPanel.svelte",
+            "reusedBy": 1
+          }
+        ],
+        "orphans": []
+      }
+    },
+    "siteDefinition": {
+      "name": "siteDefinition",
+      "summary": {
+        "skipped": "no siteDefinition catalogue in rules.json"
+      },
+      "offenders": {
+        "handRolled": [],
+        "boxedWidgets": []
+      }
+    },
+    "fileAreas": {
+      "name": "fileAreas",
+      "summary": {
+        "totalFiles": 3643,
+        "other": 2825,
+        "infrastructure": 622,
+        "tooling": 144,
+        "docs": 15,
+        "shared": 14,
+        "tests": 13,
+        "frontend": 10
+      },
+      "offenders": [
+        {
+          "area": "other",
+          "files": 2825,
+          "sourceFiles": 0,
+          "sourceLines": 0
+        },
+        {
+          "area": "infrastructure",
+          "files": 622,
+          "sourceFiles": 0,
+          "sourceLines": 0
+        },
+        {
+          "area": "tooling",
+          "files": 144,
+          "sourceFiles": 0,
+          "sourceLines": 0
+        },
+        {
+          "area": "docs",
+          "files": 15,
+          "sourceFiles": 0,
+          "sourceLines": 0
+        },
+        {
+          "area": "shared",
+          "files": 14,
+          "sourceFiles": 13,
+          "sourceLines": 311
+        },
+        {
+          "area": "tests",
+          "files": 13,
+          "sourceFiles": 6,
+          "sourceLines": 124
+        },
+        {
+          "area": "frontend",
+          "files": 10,
+          "sourceFiles": 8,
+          "sourceLines": 177
+        }
+      ]
+    },
+    "inputValidation": {
+      "name": "inputValidation",
+      "summary": {
+        "schemaTables": 0,
+        "limitedColumns": 0,
+        "writeDoors": 0,
+        "unvalidatedDoors": 0,
+        "looserLimits": 0
+      },
+      "offenders": {
+        "unvalidated": [],
+        "looserLimits": []
+      }
+    },
+    "duplication": {
+      "name": "duplication",
+      "summary": {
+        "clones": 0,
+        "duplicatedLines": 0,
+        "totalLines": 590,
+        "duplicatedPercentage": 0.0
+      },
+      "offenders": []
+    }
+  }
+}

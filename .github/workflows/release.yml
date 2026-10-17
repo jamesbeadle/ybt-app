@@ -1,0 +1,44 @@
+name: Release the app
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            name: Mac (Apple silicon)
+            rust-target: aarch64-apple-darwin
+            tauri-args: --target aarch64-apple-darwin --bundles dmg
+    runs-on: ${{ matrix.platform }}
+    name: Build for ${{ matrix.name }} and attach it to a release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: npm ci
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || 'v__VERSION__' }}
+          releaseName: YBT App v__VERSION__
+          releaseBody: Unsigned builds. On a Mac, right-click the app and choose Open the first time.
+          releaseDraft: false
+          args: ${{ matrix.tauri-args }}
