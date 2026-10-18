@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildRequest, stoppedBefore, type BuildSetup } from './buildAttempt';
+import { buildRequest, refusedAtStart, stoppedBefore, stoppedForNoRepository, type BuildSetup } from './buildAttempt';
 import { buildStages } from './buildStage';
 import type { ClaimedTask } from './claimedTask';
 
@@ -49,5 +49,29 @@ describe('stoppedBefore', () => {
 			},
 			lastLines: ['No repository is recorded.']
 		});
+	});
+});
+
+describe('stoppedForNoRepository', () => {
+	it('stops at finding the repository, as the task\'s own fault', () => {
+		const { report, lastLines } = stoppedForNoRepository();
+		expect(report.failedStep).toBe('Finding the repository');
+		expect(report.failedStage).toBe(buildStages.task);
+		expect(lastLines).toEqual(['The project has no repository recorded in YBT, so there is nothing to check out.']);
+	});
+});
+
+describe('refusedAtStart', () => {
+	it('stops at starting the build, at the stage the shell\'s refusal names', () => {
+		const { report, lastLines } = refusedAtStart({ reason: 'The repository address is not valid.', stage: buildStages.task });
+		expect(report.failedStep).toBe('Starting the build');
+		expect(report.failedStage).toBe(buildStages.task);
+		expect(lastLines).toEqual(['The repository address is not valid.']);
+	});
+
+	it('makes any other failure a fault on this computer', () => {
+		const { report, lastLines } = refusedAtStart(new Error('The builds folder could not be made'));
+		expect(report.failedStage).toBe(buildStages.machine);
+		expect(lastLines).toEqual(['The builds folder could not be made']);
 	});
 });

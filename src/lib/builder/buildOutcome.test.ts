@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { branchCompareUrl, buildOutcomes, buildRecord, failureNote, handOverNote, type BuildReport } from './buildOutcome';
+import {
+	branchCompareUrl,
+	buildOutcomes,
+	buildRecord,
+	failureNote,
+	handOverNote,
+	refusedHandOverNote,
+	type BuildReport
+} from './buildOutcome';
 import type { ClaimedTask } from './claimedTask';
 
 const task: ClaimedTask = {
@@ -65,5 +73,17 @@ describe('buildRecord', () => {
 		const unpushed = buildRecord(task, 'fix/x', { ...pushed, isPushed: false }, buildOutcomes.released, 'note', 'ok');
 		expect(unpushed.compareUrl).toBe('');
 		expect(unpushed.finishedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+	});
+});
+
+describe('refusedHandOverNote', () => {
+	it('names the pushed branch and why YBT would not take it', () => {
+		expect(refusedHandOverNote('fix/x', 'No review model is set.')).toBe(
+			'The YBT desktop app built and pushed fix/x, but YBT did not take it for review. No review model is set.'
+		);
+	});
+
+	it('fits what YBT accepts', () => {
+		expect(refusedHandOverNote('fix/x', 'reason '.repeat(400)).length).toBe(2000);
 	});
 });
