@@ -6,7 +6,7 @@ import type { YbtSession } from './ybt/ybtSession';
 const storeFile = 'ybt-desktop.json';
 const storeKeys = { settings: 'settings', session: 'session', rangeOverrides: 'rangeOverrides', harnessCheckout: 'harnessCheckout' } as const;
 
-function openStore(): Promise<Store> {
+export function openStore(): Promise<Store> {
 	return load(storeFile, { autoSave: true, defaults: {} });
 }
 

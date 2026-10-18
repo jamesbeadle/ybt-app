@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { harnessLimits } from '$lib/harness/harnessEvents';
+	import { harnessLimits } from '$lib/harness/harnessRequest';
 	import ActionButton from './ActionButton.svelte';
 
 	type TestChoice = { checkout: string; taskText: string; model: string };
