@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseClaimedTask } from './claimedTask';
+import { claimedTaskId, parseClaimedTask } from './claimedTask';
 
 const taskId = '01acc8f8-230b-4940-a560-e26ef9cb22dc';
 const projectId = '121925ec-bf29-46a2-bd62-374f3ca05648';
@@ -42,5 +42,16 @@ describe('parseClaimedTask', () => {
 
 	it('refuses an answer in another shape', () => {
 		expect(() => parseClaimedTask('Sign in first.\nMore.')).toThrow('YBT answered in a shape the builder cannot read: Sign in first.');
+	});
+});
+
+describe('claimedTaskId', () => {
+	it('reads the task id out of a claim, even one in a shape the builder cannot otherwise read', () => {
+		const reshaped = `Claimed for someone. Build this task:\nSomething new (id: ${taskId})\nProject: YourBusinessToday (id: ${projectId})`;
+		expect(claimedTaskId(reshaped)).toBe(taskId);
+	});
+
+	it('is empty when the answer names no task', () => {
+		expect(claimedTaskId('Nothing is waiting for that model: no open task you can reach is buildable.')).toBe('');
 	});
 });

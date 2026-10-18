@@ -21,8 +21,8 @@ export type BuildSetup = {
 	nextTierModelId: string;
 };
 
-/** How one build attempt ended: the shell's report and the last lines of the step that stopped it. */
-export type BuildAttempt = { report: BuildReport; lastLines: string[] };
+/** How one build attempt ended: the shell's report, the last lines of the step that stopped it, and whether the shell was reached at all. */
+export type BuildAttempt = { report: BuildReport; lastLines: string[]; hasReachedShell: boolean };
 
 export function buildRequest(setup: BuildSetup, task: ClaimedTask, branch: string): BuildRequest {
 	return {
@@ -40,5 +40,5 @@ export function buildRequest(setup: BuildSetup, task: ClaimedTask, branch: strin
 /** The attempt of a build that never reached the shell: stopped by the step named, for the reason given, with nothing kept. */
 export function stoppedBefore(step: string, reason: string): BuildAttempt {
 	const report: BuildReport = { checkout: '', failedStep: step, commitCount: 0, diffStat: '', isPushed: false };
-	return { report, lastLines: [reason] };
+	return { report, lastLines: [reason], hasReachedShell: false };
 }

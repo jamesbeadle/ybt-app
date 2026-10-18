@@ -5,4 +5,4 @@ export type HarnessRequest = {
 	lmStudioOrigin: string;
 };
 
-export const harnessLimits = { longestTaskText: 8000, longestCheckoutPath: 1000 } as const;
+export const harnessLimits = { longestTaskText: 8000 } as const;

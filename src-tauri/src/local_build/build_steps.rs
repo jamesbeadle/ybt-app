@@ -5,7 +5,11 @@ use std::collections::HashMap;
 use std::path::Path;
 
 const FIND_OR_CLONE: &str = "[ -d \"$CHECKOUT/.git\" ] && echo \"Using the checkout at $CHECKOUT.\" || \
-git clone \"$REPOSITORY_URL\" \"$CHECKOUT\"";
+{ mkdir -p \"$(dirname \"$CHECKOUT\")\" && git clone \"$REPOSITORY_URL\" \"$CHECKOUT\"; }";
+const INSTALL_DEPENDENCIES: &str = "[ -f package.json ] || { echo 'No package.json, so there is nothing to install.'; exit 0; }\n\
+[ -d node_modules ] && [ ! package-lock.json -nt node_modules ] && { echo 'The dependencies are already installed.'; exit 0; }\n\
+[ -f package-lock.json ] && exec npm ci\n\
+npm install";
 const SWITCH_TO_BRANCH: &str = "[ -z \"$(git status --porcelain)\" ] || \
 { echo 'The checkout has uncommitted changes, so nothing was built. Commit or discard them first.'; exit 1; }\n\
 git fetch origin --prune || exit 1\n\
@@ -20,10 +24,9 @@ git add -A && { git diff --cached --quiet && echo 'Nothing was left uncommitted.
 if [ \"$(git rev-list --count \"origin/$DEFAULT_BRANCH..HEAD\")\" -gt 0 ]; then git push -u origin \"$TASK_BRANCH\"; \
 else echo 'No commits to push.'; fi";
 const PROMPT_START: &str = "Build this task in this repository, following CLAUDE.md. You are on the task's branch already. \
-Run the repository's checks before you finish, commit your work on the current branch with a message that is a \
-sentence about the domain, and do not push. The task: ";
+Edit the files the task needs; the checks, the commit and the push are run for you afterwards. The task: ";
 
-/// Finding or cloning the repository and switching to the task's branch; nothing is built until both pass.
+/// Finding or cloning the repository, switching to the task's branch and installing its dependencies; nothing is built until all three pass.
 pub fn prepare_steps(request: &BuildRequest, checkout: &Checkout) -> Vec<ShellStep> {
     let clone_environment = HashMap::from([
         ("CHECKOUT".to_string(), checkout.path.to_string_lossy().to_string()),
@@ -36,6 +39,7 @@ pub fn prepare_steps(request: &BuildRequest, checkout: &Checkout) -> Vec<ShellSt
         ShellStep::new("Switch to the task's branch", SWITCH_TO_BRANCH, &checkout.path)
             .with_environment(branch_environment(request))
             .that_must_pass(),
+        ShellStep::new("Install the repository's dependencies", INSTALL_DEPENDENCIES, &checkout.path).that_must_pass(),
     ]
 }
 

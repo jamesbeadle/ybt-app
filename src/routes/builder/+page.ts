@@ -1,7 +1,8 @@
-import { readBuildHistory, readBuilderSettings } from '$lib/builder/builderStore';
+import { readBuilderSettings } from '$lib/builder/builderStore';
+import { localBuilder } from '$lib/builder/localBuilder.svelte';
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async () => ({
-	builderSettings: await readBuilderSettings(),
-	buildHistory: await readBuildHistory()
-});
+export const load: PageLoad = async () => {
+	await localBuilder.load();
+	return { builderSettings: await readBuilderSettings() };
+};

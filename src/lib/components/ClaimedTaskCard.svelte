@@ -12,7 +12,7 @@
 	let hasRepository = $derived(task.repositoryUrl !== '');
 </script>
 
-<article class="rounded-lg border border-caution/40 bg-night p-4" in:fly={rowEntrance()}>
+<article class="rounded-lg border border-caution/40 bg-carriage p-4" in:fly={rowEntrance()}>
 	<p class="mb-1 flex items-center gap-2 text-xs font-medium tracking-wide text-caution uppercase">
 		<Spinner class="size-3" />
 		<span>Building now</span>

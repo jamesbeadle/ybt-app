@@ -2,9 +2,9 @@ import { openStore } from '$lib/desktopStore';
 import type { BuildRecord } from './buildOutcome';
 
 /** What the Builder screen remembers between runs: where the repositories live and which tier this machine builds for. */
-export type BuilderSettings = { buildsFolder: string; tierModelId: string };
+type BuilderSettings = { buildsFolder: string; tierModelId: string };
 
-export const defaultBuilderSettings: BuilderSettings = { buildsFolder: '', tierModelId: '' };
+const defaultBuilderSettings: BuilderSettings = { buildsFolder: '', tierModelId: '' };
 export const longestHistory = 50;
 
 const storeKeys = { builderSettings: 'builderSettings', buildHistory: 'buildHistory' } as const;

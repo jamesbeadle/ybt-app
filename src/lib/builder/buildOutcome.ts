@@ -2,7 +2,7 @@ import type { ClaimedTask } from './claimedTask';
 
 export const buildOutcomes = { handedToReview: 'handedToReview', released: 'released' } as const;
 
-export type BuildOutcome = (typeof buildOutcomes)[keyof typeof buildOutcomes];
+type BuildOutcome = (typeof buildOutcomes)[keyof typeof buildOutcomes];
 
 /** What the app's shell reports when a local build stops: where it ran and what the branch holds. */
 export type BuildReport = {

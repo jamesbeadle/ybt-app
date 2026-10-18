@@ -14,6 +14,12 @@ pub struct BuildReport {
 }
 
 pub fn report(request: &BuildRequest, checkout: &Path, failed_step: Option<String>) -> BuildReport {
+    let checkout_text = checkout.to_string_lossy().to_string();
+    let current_branch = git_output(checkout, &["rev-parse", "--abbrev-ref", "HEAD"]);
+    let is_on_task_branch = current_branch.trim() == request.branch;
+    if !is_on_task_branch {
+        return BuildReport { checkout: checkout_text, failed_step, commit_count: 0, diff_stat: String::new(), is_pushed: false };
+    }
     let base = format!("origin/{}", request.default_branch);
     let commit_count = git_output(checkout, &["rev-list", "--count", &format!("{base}..HEAD")])
         .trim()
@@ -21,7 +27,7 @@ pub fn report(request: &BuildRequest, checkout: &Path, failed_step: Option<Strin
         .unwrap_or_default();
     let diff_stat = git_output(checkout, &["diff", "--stat", &format!("{base}...HEAD")]).trim_end().to_string();
     let is_pushed = commit_count > 0 && is_branch_pushed(request, checkout);
-    BuildReport { checkout: checkout.to_string_lossy().to_string(), failed_step, commit_count, diff_stat, is_pushed }
+    BuildReport { checkout: checkout_text, failed_step, commit_count, diff_stat, is_pushed }
 }
 
 fn is_branch_pushed(request: &BuildRequest, checkout: &Path) -> bool {

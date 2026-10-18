@@ -1,29 +1,32 @@
 <script lang="ts">
 	import type { BuildModel } from '$lib/board/buildQueue';
 	import { rangePhrase } from '$lib/board/modelRanges';
-	import { harnessLimits } from '$lib/harness/harnessRequest';
+	import { pathLimits } from '$lib/steps/pathLimits';
 	import SelectField from './SelectField.svelte';
 
 	let {
 		models,
+		hasLoadedTiers,
 		buildsFolder = $bindable(),
 		tierModelId = $bindable(),
 		nextTierLabel,
-		disabled,
+		disabled = false,
 		onchange
 	}: {
 		models: BuildModel[];
+		hasLoadedTiers: boolean;
 		buildsFolder: string;
 		tierModelId: string;
 		nextTierLabel: string;
-		disabled: boolean;
+		disabled?: boolean;
 		onchange: () => void;
 	} = $props();
 
-	const loadingChoice = 'Reading the tiers from YBT…';
+	const tierPlaceholders = { loading: 'Reading the tiers from YBT…', none: 'YBT lists no build tiers' } as const;
 
 	let modelIds = $derived(models.map((model) => model.modelId));
 	let hasTiers = $derived(models.length > 0);
+	let tierPlaceholder = $derived(hasLoadedTiers ? tierPlaceholders.none : tierPlaceholders.loading);
 	let failureSentence = $derived(
 		nextTierLabel === ''
 			? 'A build that fails is given back to YBT with a note.'
@@ -39,22 +42,15 @@
 
 <div class="grid gap-3 md:grid-cols-2" {onchange}>
 	<label class="grid gap-1 text-sm text-etch">
-		<span>Where this machine keeps the repositories it builds</span>
-		<input
-			class="field"
-			placeholder="/Users/you/ybt-builds"
-			required
-			maxlength={harnessLimits.longestCheckoutPath}
-			{disabled}
-			bind:value={buildsFolder}
-		/>
+		<span>Where this machine keeps the repositories it builds (blank means ~/ybt-builds)</span>
+		<input class="field" placeholder="~/ybt-builds" maxlength={pathLimits.longestPath} {disabled} bind:value={buildsFolder} />
 	</label>
 	<label class="grid gap-1 text-sm text-etch">
 		<span>The tier this machine builds for</span>
 		{#if hasTiers}
 			<SelectField choices={modelIds} bind:value={tierModelId} label="Tier" {labelOf} {disabled} />
 		{:else}
-			<SelectField choices={[loadingChoice]} value={loadingChoice} label="Tier" disabled />
+			<SelectField choices={[tierPlaceholder]} value={tierPlaceholder} label="Tier" disabled />
 		{/if}
 	</label>
 </div>

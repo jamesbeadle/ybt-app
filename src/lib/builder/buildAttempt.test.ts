@@ -38,7 +38,8 @@ describe('stoppedBefore', () => {
 	it('reports a build that never started as failed at the step named, keeping only the reason', () => {
 		expect(stoppedBefore('Finding the repository', 'No repository is recorded.')).toEqual({
 			report: { checkout: '', failedStep: 'Finding the repository', commitCount: 0, diffStat: '', isPushed: false },
-			lastLines: ['No repository is recorded.']
+			lastLines: ['No repository is recorded.'],
+			hasReachedShell: false
 		});
 	});
 });

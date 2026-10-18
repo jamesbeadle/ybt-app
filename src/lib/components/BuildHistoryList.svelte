@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { BuildRecord } from '$lib/builder/buildOutcome';
 	import BuildRecordRow from './BuildRecordRow.svelte';
+	import EmptyNotice from './EmptyNotice.svelte';
 	import Panel from './Panel.svelte';
 
 	let { records }: { records: BuildRecord[] } = $props();
@@ -14,8 +15,6 @@
 			{#each records as record (`${record.taskId} ${record.finishedAt}`)}<BuildRecordRow {record} />{/each}
 		</ol>
 	{:else}
-		<p class="rounded-lg border border-dashed border-hairline px-3 py-4 text-center text-sm text-mist">
-			No branch has been built on this machine yet.
-		</p>
+		<EmptyNotice>No branch has been built on this machine yet.</EmptyNotice>
 	{/if}
 </Panel>

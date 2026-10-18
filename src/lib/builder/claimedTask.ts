@@ -14,6 +14,7 @@ const claimedForLine = /^Claimed for .*\n/;
 const headlinePattern = /^(.+) — \w+ task, .*?(\d+) points, \d+% done \(id: ([0-9a-f-]{36})\)$/m;
 const projectPattern = /^Project: (.+) \(id: [0-9a-f-]{36}\)$/m;
 const codePattern = /^Code: (\S+) \(deploys from (\S+)\)\.$/m;
+const firstIdPattern = /\(id: ([0-9a-f-]{36})\)/;
 
 /** The claimed task, or null when YBT says nothing is waiting; a shape the builder cannot read throws. */
 export function parseClaimedTask(answer: string): ClaimedTask | null {
@@ -33,6 +34,12 @@ export function parseClaimedTask(answer: string): ClaimedTask | null {
 		defaultBranch: code === null ? '' : code[2],
 		text
 	};
+}
+
+/** The first task id in an answer, or nothing, so a claim the builder cannot read can still be given back. */
+export function claimedTaskId(answer: string): string {
+	const match = firstIdPattern.exec(answer);
+	return match === null ? '' : match[1];
 }
 
 function unreadableAnswer(answer: string): Error {

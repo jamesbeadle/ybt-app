@@ -1,4 +1,5 @@
 import { performAction } from '$lib/ybt/ybtConnector';
+import { confirmedHandOver, confirmedHandUp, confirmedRelease } from './ybtAnswers';
 
 const actions = {
 	nextBuildableTask: 'next_buildable_task',
@@ -13,12 +14,13 @@ export function claimNextTask(modelId: string, agent: string): Promise<string> {
 	return performAction(actions.nextBuildableTask, { modelId, agent });
 }
 
-/** Records the branch as built and hands it to the review model, which raises the review task. */
-export function handOverBuild(taskId: string, branch: string, agent: string, model: string, note: string): Promise<string> {
-	return performAction(actions.submitLocalBuild, { taskId, branch, agent, model, note });
+/** Records the branch as built and hands it to the review model, which raises the review task; a refusal is raised. */
+export async function handOverBuild(taskId: string, branch: string, agent: string, model: string, note: string): Promise<string> {
+	const answer = await performAction(actions.submitLocalBuild, { taskId, branch, agent, model, note });
+	return confirmedHandOver(answer, branch);
 }
 
-/** Gives the task up with a note, then points it at the next tier when there is one, so a cloud model takes it. */
+/** Gives the task up with a note, then points it at the next tier when there is one, so a cloud model takes it; a refusal is raised. */
 export async function releaseBuild(
 	taskId: string,
 	agent: string,
@@ -26,8 +28,9 @@ export async function releaseBuild(
 	note: string,
 	nextModelId: string
 ): Promise<string> {
-	const answer = await performAction(actions.recordLifecycleStep, { taskId, step: releasedStep, agent, model, note });
-	if (nextModelId === '') return answer;
-	await performAction(actions.setTaskBuildable, { taskId, isBuildable: true, modelId: nextModelId });
-	return answer;
+	const releaseAnswer = await performAction(actions.recordLifecycleStep, { taskId, step: releasedStep, agent, model, note });
+	const released = confirmedRelease(releaseAnswer);
+	if (nextModelId === '') return released;
+	const handUpAnswer = await performAction(actions.setTaskBuildable, { taskId, isBuildable: true, modelId: nextModelId });
+	return `${released} ${confirmedHandUp(handUpAnswer, nextModelId)}`;
 }
