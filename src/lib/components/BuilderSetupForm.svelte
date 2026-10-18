@@ -1,0 +1,57 @@
+<script lang="ts">
+	import type { BuildModel } from '$lib/board/buildQueue';
+	import { rangePhrase } from '$lib/board/modelRanges';
+	import { pathLimits } from '$lib/steps/pathLimits';
+	import SelectField from './SelectField.svelte';
+
+	let {
+		models,
+		hasLoadedTiers,
+		buildsFolder = $bindable(),
+		tierModelId = $bindable(),
+		nextTierLabel,
+		disabled = false,
+		onchange
+	}: {
+		models: BuildModel[];
+		hasLoadedTiers: boolean;
+		buildsFolder: string;
+		tierModelId: string;
+		nextTierLabel: string;
+		disabled?: boolean;
+		onchange: () => void;
+	} = $props();
+
+	const tierPlaceholders = { loading: 'Reading the tiers from YBT…', none: 'YBT lists no build tiers' } as const;
+
+	let modelIds = $derived(models.map((model) => model.modelId));
+	let hasTiers = $derived(models.length > 0);
+	let tierPlaceholder = $derived(hasLoadedTiers ? tierPlaceholders.none : tierPlaceholders.loading);
+	let failureSentence = $derived(
+		nextTierLabel === ''
+			? 'A build that fails is given back to YBT with a note.'
+			: `A build that fails is given back with a note and handed up to the ${nextTierLabel}.`
+	);
+
+	function labelOf(modelId: string): string {
+		const model = models.find((candidate) => candidate.modelId === modelId);
+		if (model === undefined) return modelId;
+		return `${model.label} (${rangePhrase(model)})`;
+	}
+</script>
+
+<div class="grid gap-3 md:grid-cols-2" {onchange}>
+	<label class="grid gap-1 text-sm text-etch">
+		<span>Where this machine keeps the repositories it builds (blank means ~/ybt-builds)</span>
+		<input class="field" placeholder="~/ybt-builds" maxlength={pathLimits.longestPath} {disabled} bind:value={buildsFolder} />
+	</label>
+	<label class="grid gap-1 text-sm text-etch">
+		<span>The tier this machine builds for</span>
+		{#if hasTiers}
+			<SelectField choices={modelIds} bind:value={tierModelId} label="Tier" {labelOf} {disabled} />
+		{:else}
+			<SelectField choices={[tierPlaceholder]} value={tierPlaceholder} label="Tier" disabled />
+		{/if}
+	</label>
+</div>
+<p class="mt-3 text-sm text-mist">{failureSentence}</p>

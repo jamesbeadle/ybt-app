@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { harnessLimits } from '$lib/harness/harnessEvents';
+	import { harnessLimits } from '$lib/harness/harnessRequest';
+	import { pathLimits } from '$lib/steps/pathLimits';
 	import ActionButton from './ActionButton.svelte';
 
 	type TestChoice = { checkout: string; taskText: string; model: string };
@@ -28,7 +29,7 @@
 			class="field"
 			placeholder="/Users/you/ybt-builds/YourBusinessToday"
 			required
-			maxlength={harnessLimits.longestCheckoutPath}
+			maxlength={pathLimits.longestPath}
 			bind:value={checkout}
 		/>
 	</label>

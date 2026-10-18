@@ -1,5 +1,6 @@
 <script lang="ts">
 	import BoardTaskCard from './BoardTaskCard.svelte';
+	import EmptyNotice from './EmptyNotice.svelte';
 	import type { BuildModel, BuildQueueEntry } from '$lib/board/buildQueue';
 	import { rangePhrase } from '$lib/board/modelRanges';
 
@@ -17,6 +18,6 @@
 	{#each tasks as task (task.taskId)}
 		<BoardTaskCard {task} />
 	{:else}
-		<p class="rounded-lg border border-dashed border-hairline px-3 py-4 text-center text-sm text-mist">Nothing waiting.</p>
+		<EmptyNotice>Nothing waiting.</EmptyNotice>
 	{/each}
 </section>

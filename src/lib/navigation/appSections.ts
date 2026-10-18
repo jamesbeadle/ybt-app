@@ -4,6 +4,7 @@ export const appSections: AppSection[] = [
 	{ href: '/', label: 'Connections' },
 	{ href: '/chat', label: 'Chat' },
 	{ href: '/board', label: 'Board' },
+	{ href: '/builder', label: 'Builder' },
 	{ href: '/activity', label: 'Activity' },
 	{ href: '/test', label: 'Local test' },
 	{ href: '/settings', label: 'Settings' }

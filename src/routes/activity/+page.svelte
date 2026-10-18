@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import ActivityStepRow from '$lib/components/ActivityStepRow.svelte';
+	import EmptyNotice from '$lib/components/EmptyNotice.svelte';
 	import LoadingLine from '$lib/components/LoadingLine.svelte';
 	import Panel from '$lib/components/Panel.svelte';
 	import ServedModelRow from '$lib/components/ServedModelRow.svelte';
@@ -46,9 +47,7 @@
 	{:else if activity.stepProblem !== ''}
 		<p class="text-signal">{activity.stepProblem}</p>
 	{:else if !activity.hasSteps}
-		<p class="rounded-lg border border-dashed border-hairline px-3 py-4 text-center text-sm text-mist">
-			No AI has recorded a step yet.
-		</p>
+		<EmptyNotice>No AI has recorded a step yet.</EmptyNotice>
 	{/if}
 	<ol class="grid gap-3">
 		{#each activity.steps as step (step.id)}<ActivityStepRow {step} />{/each}

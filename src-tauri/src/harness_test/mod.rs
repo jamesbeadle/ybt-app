@@ -1,9 +1,7 @@
-mod events;
-mod run_step;
 mod steps;
 
-use events::HarnessEvent;
-use std::path::PathBuf;
+use crate::shell_steps::{run_steps, StepEvent};
+use std::path::{Path, PathBuf};
 use tauri::ipc::Channel;
 
 /// What the test screen asks for: the task to build, where, and on which local model.
@@ -18,7 +16,7 @@ pub struct HarnessRequest {
 
 /// Builds one task with Claude Code on the local model, then checks it, sending every line as it happens.
 #[tauri::command]
-pub async fn run_harness_test(request: HarnessRequest, on_event: Channel<HarnessEvent>) -> Result<(), String> {
+pub async fn run_harness_test(request: HarnessRequest, on_event: Channel<StepEvent>) -> Result<(), String> {
     let checkout = PathBuf::from(&request.checkout);
     if !checkout.join(".git").exists() {
         return Err(format!("{} is not a git checkout.", request.checkout));
@@ -28,12 +26,7 @@ pub async fn run_harness_test(request: HarnessRequest, on_event: Channel<Harness
         .map_err(|error| error.to_string())
 }
 
-fn run_every_step(request: &HarnessRequest, checkout: &PathBuf, on_event: &Channel<HarnessEvent>) {
-    for step in steps::harness_steps(request) {
-        let is_passed = run_step::run_step(&step, checkout, on_event);
-        if !is_passed && step.must_pass {
-            break;
-        }
-    }
-    let _ = on_event.send(HarnessEvent::Finished);
+fn run_every_step(request: &HarnessRequest, checkout: &Path, on_event: &Channel<StepEvent>) {
+    run_steps(&steps::harness_steps(request, checkout), on_event);
+    let _ = on_event.send(StepEvent::Finished);
 }

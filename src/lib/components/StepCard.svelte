@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { rowEntrance } from '$lib/motion/entrances';
-	import { stepStates, type HarnessStepView, type StepState } from '$lib/harness/harnessEvents';
+	import { stepStates, type StepState, type StepView } from '$lib/steps/stepEvents';
 	import Spinner from './Spinner.svelte';
 
-	let { step }: { step: HarnessStepView } = $props();
+	let { step }: { step: StepView } = $props();
 
 	const stateWords: Record<StepState, string> = { running: 'Running', passed: 'Passed', failed: 'Failed' };
 	const stateColours: Record<StepState, string> = { running: 'text-caution', passed: 'text-go', failed: 'text-signal' };

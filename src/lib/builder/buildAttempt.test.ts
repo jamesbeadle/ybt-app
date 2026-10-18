@@ -1,0 +1,77 @@
+import { describe, expect, it } from 'vitest';
+import { buildRequest, refusedAtStart, stoppedBefore, stoppedForNoRepository, type BuildSetup } from './buildAttempt';
+import { buildStages } from './buildStage';
+import type { ClaimedTask } from './claimedTask';
+
+const setup: BuildSetup = {
+	lmStudioOrigin: 'http://localhost:1234',
+	buildsFolder: '/Users/james/ybt-builds',
+	model: 'qwen3.6-35b-a3b',
+	tierModelId: 'qwen-local',
+	nextTierModelId: 'claude-opus'
+};
+const task: ClaimedTask = {
+	taskId: '01acc8f8-230b-4940-a560-e26ef9cb22dc',
+	title: 'FIX: the invoice total is rounded up',
+	storyPoints: 2,
+	projectName: 'YourBusinessToday',
+	repositoryUrl: 'https://github.com/Your-Business-Today/YourBusinessToday',
+	defaultBranch: 'main',
+	text: 'FIX: the invoice total is rounded up — Work task, Backlog, 2 points, 0% done'
+};
+
+describe('buildRequest', () => {
+	it('hands the shell the repository, the branch, the task and the model', () => {
+		expect(buildRequest(setup, task, 'fix/invoice-total-rounded')).toEqual({
+			buildsFolder: '/Users/james/ybt-builds',
+			repositoryUrl: 'https://github.com/Your-Business-Today/YourBusinessToday',
+			defaultBranch: 'main',
+			branch: 'fix/invoice-total-rounded',
+			taskTitle: 'FIX: the invoice total is rounded up',
+			taskText: task.text,
+			model: 'qwen3.6-35b-a3b',
+			lmStudioOrigin: 'http://localhost:1234'
+		});
+	});
+});
+
+describe('stoppedBefore', () => {
+	it('reports a build that never started as failed at the step named, keeping only the reason', () => {
+		const refusal = { reason: 'No repository is recorded.', stage: buildStages.task };
+		expect(stoppedBefore('Finding the repository', refusal)).toEqual({
+			report: {
+				checkout: '',
+				failedStep: 'Finding the repository',
+				failedStage: buildStages.task,
+				commitCount: 0,
+				diffStat: '',
+				isPushed: false
+			},
+			lastLines: ['No repository is recorded.']
+		});
+	});
+});
+
+describe('stoppedForNoRepository', () => {
+	it('stops at finding the repository, as the task\'s own fault', () => {
+		const { report, lastLines } = stoppedForNoRepository();
+		expect(report.failedStep).toBe('Finding the repository');
+		expect(report.failedStage).toBe(buildStages.task);
+		expect(lastLines).toEqual(['The project has no repository recorded in YBT, so there is nothing to check out.']);
+	});
+});
+
+describe('refusedAtStart', () => {
+	it('stops at starting the build, at the stage the shell\'s refusal names', () => {
+		const { report, lastLines } = refusedAtStart({ reason: 'The repository address is not valid.', stage: buildStages.task });
+		expect(report.failedStep).toBe('Starting the build');
+		expect(report.failedStage).toBe(buildStages.task);
+		expect(lastLines).toEqual(['The repository address is not valid.']);
+	});
+
+	it('makes any other failure a fault on this computer', () => {
+		const { report, lastLines } = refusedAtStart(new Error('The builds folder could not be made'));
+		expect(report.failedStage).toBe(buildStages.machine);
+		expect(lastLines).toEqual(['The builds folder could not be made']);
+	});
+});

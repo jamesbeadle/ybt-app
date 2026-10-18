@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import HarnessStepCard from '$lib/components/HarnessStepCard.svelte';
+	import StepList from '$lib/components/StepList.svelte';
 	import HarnessTestForm from '$lib/components/HarnessTestForm.svelte';
 	import ModelChoiceRow from '$lib/components/ModelChoiceRow.svelte';
 	import Panel from '$lib/components/Panel.svelte';
@@ -34,6 +34,4 @@
 	<HarnessTestForm modelId={choice.modelId} bind:checkout isRunning={test.isRunning} onrun={run} />
 </Panel>
 {#if test.problem !== ''}<p class="text-signal">{test.problem}</p>{/if}
-<ol class="grid gap-3">
-	{#each test.steps as step, index (index)}<HarnessStepCard {step} />{/each}
-</ol>
+<StepList feed={test.feed} />
