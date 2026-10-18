@@ -29,7 +29,9 @@
 	let nextTierModelId = $derived(escalation === null ? '' : escalation.modelId);
 	let nextTierLabel = $derived(escalation === null ? '' : escalation.label);
 	let isSetUp = $derived(choice.hasModel && tierModelId !== '');
-	let canBuild = $derived(isSetUp && !localBuilder.isBuilding);
+	let hasReviewModel = $derived(board.reviewModelId !== '');
+	let isMissingReviewModel = $derived(board.hasLoaded && board.problem === '' && !hasReviewModel);
+	let canBuild = $derived(isSetUp && hasReviewModel && !localBuilder.isBuilding);
 
 	function buildSetup(): BuildSetup {
 		return { lmStudioOrigin, buildsFolder: buildsFolder.trim(), model: choice.modelId, tierModelId, nextTierModelId };
@@ -76,6 +78,9 @@
 	/>
 </Panel>
 {#if board.problem !== ''}<p class="text-signal">{board.problem}</p>{/if}
+{#if isMissingReviewModel}
+	<EmptyNotice>No review model is chosen in YBT, so nothing can be built. An administrator chooses one on YBT's admin page.</EmptyNotice>
+{/if}
 {#if localBuilder.problem !== ''}<p class="text-signal">{localBuilder.problem}</p>{/if}
 {#if localBuilder.notice !== ''}<EmptyNotice>{localBuilder.notice}</EmptyNotice>{/if}
 {#if localBuilder.current !== null}<ClaimedTaskCard build={localBuilder.current} />{/if}
