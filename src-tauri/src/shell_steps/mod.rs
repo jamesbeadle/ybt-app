@@ -1,5 +1,7 @@
 mod claude_code;
 mod events;
+mod login_path;
+mod lossy_lines;
 pub mod repository_checks;
 mod run_step;
 mod run_steps;

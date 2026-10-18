@@ -14,6 +14,7 @@ const task: ClaimedTask = {
 const pushed: BuildReport = {
 	checkout: '/Users/james/ybt-builds/YourBusinessToday',
 	failedStep: null,
+	failedStage: null,
 	commitCount: 2,
 	diffStat: ' 1 file changed',
 	isPushed: true

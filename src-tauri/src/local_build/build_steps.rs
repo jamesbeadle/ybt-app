@@ -1,38 +1,22 @@
+use super::build_scripts::{
+    COMMIT_LEFTOVERS, FIND_CLAUDE_CODE, FIND_OR_CLONE, INSTALL_DEPENDENCIES, KEEP_UNFINISHED_WORK, PROMPT_START,
+    PUSH_BRANCH, SWITCH_TO_BRANCH,
+};
 use super::checkout::Checkout;
 use super::BuildRequest;
 use crate::shell_steps::{claude_code_environment, repository_checks, ShellStep, BUILD_WITH_CLAUDE_CODE};
 use std::collections::HashMap;
 use std::path::Path;
 
-const FIND_OR_CLONE: &str = "[ -d \"$CHECKOUT/.git\" ] && echo \"Using the checkout at $CHECKOUT.\" || \
-{ mkdir -p \"$(dirname \"$CHECKOUT\")\" && git clone \"$REPOSITORY_URL\" \"$CHECKOUT\"; }";
-const INSTALL_DEPENDENCIES: &str = "[ -f package.json ] || { echo 'No package.json, so there is nothing to install.'; exit 0; }\n\
-[ -d node_modules ] && [ ! package-lock.json -nt node_modules ] && { echo 'The dependencies are already installed.'; exit 0; }\n\
-[ -f package-lock.json ] && exec npm ci\n\
-npm install";
-const SWITCH_TO_BRANCH: &str = "[ -z \"$(git status --porcelain)\" ] || \
-{ echo 'The checkout has uncommitted changes, so nothing was built. Commit or discard them first.'; exit 1; }\n\
-git fetch origin --prune || exit 1\n\
-git switch \"$TASK_BRANCH\" 2>/dev/null || git switch -c \"$TASK_BRANCH\" \"origin/$DEFAULT_BRANCH\"";
-const COMMIT_LEFTOVERS: &str = "git checkout -q -- tools/refactor/audit-output 2>/dev/null\n\
-git add -A && { git diff --cached --quiet || git commit -q -m \"$COMMIT_MESSAGE\"; } || exit 1\n\
-[ \"$(git rev-list --count \"origin/$DEFAULT_BRANCH..HEAD\")\" -gt 0 ] || \
-{ echo 'No commits were made, so there is nothing to hand to review.'; exit 1; }";
-const PUSH_BRANCH: &str = "git push -u origin \"$TASK_BRANCH\"";
-const KEEP_UNFINISHED_WORK: &str = "git checkout -q -- tools/refactor/audit-output 2>/dev/null\n\
-git add -A && { git diff --cached --quiet && echo 'Nothing was left uncommitted.' || git commit -q -m \"$COMMIT_MESSAGE\"; }\n\
-if [ \"$(git rev-list --count \"origin/$DEFAULT_BRANCH..HEAD\")\" -gt 0 ]; then git push -u origin \"$TASK_BRANCH\"; \
-else echo 'No commits to push.'; fi";
-const PROMPT_START: &str = "Build this task in this repository, following CLAUDE.md. You are on the task's branch already. \
-Edit the files the task needs; the checks, the commit and the push are run for you afterwards. The task: ";
-
-/// Finding or cloning the repository, switching to the task's branch and installing its dependencies; nothing is built until all three pass.
+/// Finding Claude Code, finding or cloning the repository, switching to the task's branch and installing its dependencies;
+/// nothing is built until all four pass.
 pub fn prepare_steps(request: &BuildRequest, checkout: &Checkout) -> Vec<ShellStep> {
     let clone_environment = HashMap::from([
         ("CHECKOUT".to_string(), checkout.path.to_string_lossy().to_string()),
         ("REPOSITORY_URL".to_string(), request.repository_url.clone()),
     ]);
     vec![
+        ShellStep::new("Find Claude Code", FIND_CLAUDE_CODE, &checkout.builds_folder).that_must_pass(),
         ShellStep::new("Find or clone the repository", FIND_OR_CLONE, &checkout.builds_folder)
             .with_environment(clone_environment)
             .that_must_pass(),
@@ -43,7 +27,7 @@ pub fn prepare_steps(request: &BuildRequest, checkout: &Checkout) -> Vec<ShellSt
     ]
 }
 
-/// Building, checking, committing and pushing the task's branch; every step must pass for the branch to reach review.
+/// Building, checking and committing the task's branch; every step must pass before the branch is pushed.
 pub fn work_steps(request: &BuildRequest, checkout: &Path) -> Vec<ShellStep> {
     let build_title = format!("Claude Code builds the task on {}", request.model);
     let prompt = format!("{PROMPT_START}{}", request.task_text);
@@ -58,10 +42,14 @@ pub fn work_steps(request: &BuildRequest, checkout: &Path) -> Vec<ShellStep> {
         ShellStep::new("Commit what was left uncommitted", COMMIT_LEFTOVERS, checkout)
             .with_environment(commit_environment(request, &commit_message))
             .that_must_pass(),
-        ShellStep::new("Push the branch", PUSH_BRANCH, checkout)
-            .with_environment(branch_environment(request))
-            .that_must_pass(),
     ]
+}
+
+/// Pushing the finished branch so review can read it.
+pub fn push_step(request: &BuildRequest, checkout: &Path) -> ShellStep {
+    ShellStep::new("Push the branch", PUSH_BRANCH, checkout)
+        .with_environment(branch_environment(request))
+        .that_must_pass()
 }
 
 /// Commits whatever a failed build left behind and pushes the branch, so whoever takes the task next can see the work.

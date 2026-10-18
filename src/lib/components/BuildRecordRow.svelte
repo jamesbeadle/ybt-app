@@ -6,9 +6,21 @@
 
 	let { record }: { record: BuildRecord } = $props();
 
-	const outcomeWords = { [buildOutcomes.handedToReview]: 'Handed to review', [buildOutcomes.released]: 'Given back' };
-	const outcomeColours = { [buildOutcomes.handedToReview]: 'text-go', [buildOutcomes.released]: 'text-signal' };
-	const dotColours = { [buildOutcomes.handedToReview]: 'bg-go', [buildOutcomes.released]: 'bg-signal' };
+	const outcomeWords = {
+		[buildOutcomes.handedToReview]: 'Handed to review',
+		[buildOutcomes.released]: 'Given back',
+		[buildOutcomes.setAside]: 'Set aside'
+	};
+	const outcomeColours = {
+		[buildOutcomes.handedToReview]: 'text-go',
+		[buildOutcomes.released]: 'text-signal',
+		[buildOutcomes.setAside]: 'text-caution'
+	};
+	const dotColours = {
+		[buildOutcomes.handedToReview]: 'bg-go',
+		[buildOutcomes.released]: 'bg-signal',
+		[buildOutcomes.setAside]: 'bg-caution'
+	};
 
 	let when = $derived(new Date(record.finishedAt).toLocaleString());
 	let detailLine = $derived(`${record.projectName} · ${commitPhrase(record.commitCount)} · ${when}`);

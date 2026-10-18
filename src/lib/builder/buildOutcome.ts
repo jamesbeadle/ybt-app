@@ -1,13 +1,15 @@
+import type { BuildStage } from './buildStage';
 import type { ClaimedTask } from './claimedTask';
 
-export const buildOutcomes = { handedToReview: 'handedToReview', released: 'released' } as const;
+export const buildOutcomes = { handedToReview: 'handedToReview', released: 'released', setAside: 'setAside' } as const;
 
 type BuildOutcome = (typeof buildOutcomes)[keyof typeof buildOutcomes];
 
-/** What the app's shell reports when a local build stops: where it ran and what the branch holds. */
+/** What the app's shell reports when a local build stops: where it ran, where it stopped and why, and what the branch holds. */
 export type BuildReport = {
 	checkout: string;
 	failedStep: string | null;
+	failedStage: BuildStage | null;
 	commitCount: number;
 	diffStat: string;
 	isPushed: boolean;
@@ -53,6 +55,12 @@ export function failureNote(report: BuildReport, branch: string, lastLines: stri
 
 export function handOverNote(report: BuildReport): string {
 	return `Built by the YBT desktop app on the local model: ${commitPhrase(report.commitCount)}, checked and pushed.`;
+}
+
+/** The note left on a task whose pushed branch YBT would not take for review, so whoever builds it next finds the branch and why. */
+export function refusedHandOverNote(branch: string, reason: string): string {
+	const note = `The YBT desktop app built and pushed ${branch}, but YBT did not take it for review. ${reason}`;
+	return note.slice(0, longestNote);
 }
 
 export function buildRecord(

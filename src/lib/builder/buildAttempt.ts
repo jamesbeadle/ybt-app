@@ -1,4 +1,5 @@
 import type { BuildReport } from './buildOutcome';
+import { buildRefusal, buildStages, type BuildRefusal } from './buildStage';
 import type { ClaimedTask } from './claimedTask';
 
 /** What the app's shell is asked to build: the repository and branch, the task, and the local model that writes the code. */
@@ -13,6 +14,12 @@ export type BuildRequest = {
 	lmStudioOrigin: string;
 };
 
+const stepsBeforeTheShell = { findingRepository: 'Finding the repository', startingBuild: 'Starting the build' } as const;
+const noRepository: BuildRefusal = {
+	reason: 'The project has no repository recorded in YBT, so there is nothing to check out.',
+	stage: buildStages.task
+};
+
 export type BuildSetup = {
 	lmStudioOrigin: string;
 	buildsFolder: string;
@@ -21,8 +28,8 @@ export type BuildSetup = {
 	nextTierModelId: string;
 };
 
-/** How one build attempt ended: the shell's report, the last lines of the step that stopped it, and whether the shell was reached at all. */
-export type BuildAttempt = { report: BuildReport; lastLines: string[]; hasReachedShell: boolean };
+/** How one build attempt ended: the shell's report and the last lines of the step that stopped it. */
+export type BuildAttempt = { report: BuildReport; lastLines: string[] };
 
 export function buildRequest(setup: BuildSetup, task: ClaimedTask, branch: string): BuildRequest {
 	return {
@@ -37,8 +44,26 @@ export function buildRequest(setup: BuildSetup, task: ClaimedTask, branch: strin
 	};
 }
 
-/** The attempt of a build that never reached the shell: stopped by the step named, for the reason given, with nothing kept. */
-export function stoppedBefore(step: string, reason: string): BuildAttempt {
-	const report: BuildReport = { checkout: '', failedStep: step, commitCount: 0, diffStat: '', isPushed: false };
-	return { report, lastLines: [reason], hasReachedShell: false };
+/** The attempt of a build that never got going: stopped by the step named, for the refusal's reason and at its stage, with nothing kept. */
+export function stoppedBefore(step: string, refusal: BuildRefusal): BuildAttempt {
+	const { reason, stage } = refusal;
+	const report: BuildReport = {
+		checkout: '',
+		failedStep: step,
+		failedStage: stage,
+		commitCount: 0,
+		diffStat: '',
+		isPushed: false
+	};
+	return { report, lastLines: [reason] };
+}
+
+/** The attempt of a task whose project has no repository in YBT: the task's own fault, so it is set aside rather than handed up. */
+export function stoppedForNoRepository(): BuildAttempt {
+	return stoppedBefore(stepsBeforeTheShell.findingRepository, noRepository);
+}
+
+/** The attempt of a build the app's shell refused to start, at the stage its refusal names. */
+export function refusedAtStart(failure: unknown): BuildAttempt {
+	return stoppedBefore(stepsBeforeTheShell.startingBuild, buildRefusal(failure));
 }

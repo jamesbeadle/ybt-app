@@ -1,3 +1,4 @@
+use super::build_stage::BuildRefusal;
 use super::BuildRequest;
 use std::path::{Path, PathBuf};
 use tauri::Manager;
@@ -15,12 +16,14 @@ pub struct Checkout {
 }
 
 /// Finds the checkout for the request's repository, making the builds folder when it does not exist yet.
-pub fn locate(app: &tauri::AppHandle, request: &BuildRequest) -> Result<Checkout, String> {
-    let builds_folder = builds_folder(app, &request.builds_folder)?;
-    std::fs::create_dir_all(&builds_folder)
-        .map_err(|error| format!("The builds folder {} could not be made: {error}", builds_folder.display()))?;
-    let path = builds_folder.join(repository_folder(&request.repository_url)?);
-    Ok(Checkout { builds_folder, path })
+/// A builds folder that cannot be used is this computer's to fix; a repository with no readable name is the task's.
+pub fn locate(app: &tauri::AppHandle, request: &BuildRequest) -> Result<Checkout, BuildRefusal> {
+    let builds_folder = builds_folder(app, &request.builds_folder).map_err(BuildRefusal::on_this_machine)?;
+    std::fs::create_dir_all(&builds_folder).map_err(|error| {
+        BuildRefusal::on_this_machine(format!("The builds folder {} could not be made: {error}", builds_folder.display()))
+    })?;
+    let repository = repository_folder(&request.repository_url).map_err(BuildRefusal::in_the_task)?;
+    Ok(Checkout { path: builds_folder.join(repository), builds_folder })
 }
 
 fn builds_folder(app: &tauri::AppHandle, chosen: &str) -> Result<PathBuf, String> {

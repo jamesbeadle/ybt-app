@@ -1,9 +1,10 @@
 import { invoke } from '@tauri-apps/api/core';
 import { failureText } from '$lib/failures/failureText';
 import { StepFeed } from '$lib/steps/stepFeed.svelte';
-import { buildRequest, stoppedBefore, type BuildAttempt, type BuildSetup } from './buildAttempt';
+import { buildRequest, refusedAtStart, stoppedForNoRepository, type BuildAttempt, type BuildSetup } from './buildAttempt';
 import { buildOutcomes, type BuildRecord, type BuildReport } from './buildOutcome';
 import { longestHistory, readBuildHistory, saveBuildHistory } from './builderStore';
+import { keepClaim } from './claimHeartbeat';
 import { claimTask } from './claimTask';
 import type { ClaimedTask } from './claimedTask';
 import { finishBuild } from './finishBuild';
@@ -11,8 +12,6 @@ import { taskBranchName } from './taskBranchName';
 
 const buildCommand = 'run_local_build';
 const tailLength = 40;
-const stepsBeforeTheShell = { findingRepository: 'Finding the repository', startingBuild: 'Starting the build' } as const;
-const noRepositoryNote = 'The project has no repository recorded in YBT, so there is nothing to check out.';
 const nothingWaitingNotice = 'Nothing is waiting for the local model.';
 
 export type CurrentBuild = { task: ClaimedTask; branch: string };
@@ -35,25 +34,25 @@ export class LocalBuilder {
 		this.hasLoaded = true;
 	}
 
-	/** Builds one task; true when it was handed to review, false when nothing waited, it was given back, or one is building already. */
+	/** Builds one task; true when another may follow it, false when nothing waited, it was given back, or one is building already. */
 	async buildNext(setup: BuildSetup): Promise<boolean> {
 		if (this.isBuilding) return false;
 		this.problem = '';
 		this.notice = '';
 		this.isBuilding = true;
-		const isHandedOver = await this.claimAndBuild(setup).catch((failure: unknown) => ((this.problem = failureText(failure)), false));
+		const canCarryOn = await this.claimAndBuild(setup).catch((failure: unknown) => ((this.problem = failureText(failure)), false));
 		this.isBuilding = false;
-		return isHandedOver;
+		return canCarryOn;
 	}
 
-	/** Builds task after task, reading the set-up afresh each time, until a build is not handed over or stop is pressed. */
+	/** Builds task after task, reading the set-up afresh each time, until a build is given back or stop is pressed. */
 	async keepGoing(setup: () => BuildSetup): Promise<void> {
 		if (this.isBuilding) return;
 		this.isKeepingGoing = true;
-		let isHandedOver = true;
-		while (this.isKeepingGoing && isHandedOver) {
+		let canCarryOn = true;
+		while (this.isKeepingGoing && canCarryOn) {
 			const nextSetup = setup();
-			isHandedOver = await this.buildNext(nextSetup);
+			canCarryOn = await this.buildNext(nextSetup);
 		}
 		this.isKeepingGoing = false;
 	}
@@ -72,18 +71,20 @@ export class LocalBuilder {
 			const attempt = await this.attempt(setup, task, branch);
 			const record = await finishBuild(setup, task, branch, attempt);
 			await this.remember(record);
-			return record.outcome === buildOutcomes.handedToReview;
+			return record.outcome !== buildOutcomes.released;
 		} finally {
 			this.current = null;
 		}
 	}
 
 	private async attempt(setup: BuildSetup, task: ClaimedTask, branch: string): Promise<BuildAttempt> {
-		if (task.repositoryUrl === '') return stoppedBefore(stepsBeforeTheShell.findingRepository, noRepositoryNote);
+		if (task.repositoryUrl === '') return stoppedForNoRepository();
 		const request = buildRequest(setup, task, branch);
+		const stopKeepingClaim = keepClaim(task.taskId, setup.model);
 		return invoke<BuildReport>(buildCommand, { request, onEvent: this.feed.channel() })
-			.then((report) => ({ report, lastLines: this.feed.lastLinesOf(report.failedStep ?? '', tailLength), hasReachedShell: true }))
-			.catch((failure: unknown) => stoppedBefore(stepsBeforeTheShell.startingBuild, failureText(failure)));
+			.then((report) => ({ report, lastLines: this.feed.lastLinesOf(report.failedStep ?? '', tailLength) }))
+			.catch(refusedAtStart)
+			.finally(stopKeepingClaim);
 	}
 
 	private async remember(record: BuildRecord): Promise<void> {

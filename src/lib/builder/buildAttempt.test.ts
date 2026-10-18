@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildRequest, stoppedBefore, type BuildSetup } from './buildAttempt';
+import { buildStages } from './buildStage';
 import type { ClaimedTask } from './claimedTask';
 
 const setup: BuildSetup = {
@@ -36,10 +37,17 @@ describe('buildRequest', () => {
 
 describe('stoppedBefore', () => {
 	it('reports a build that never started as failed at the step named, keeping only the reason', () => {
-		expect(stoppedBefore('Finding the repository', 'No repository is recorded.')).toEqual({
-			report: { checkout: '', failedStep: 'Finding the repository', commitCount: 0, diffStat: '', isPushed: false },
-			lastLines: ['No repository is recorded.'],
-			hasReachedShell: false
+		const refusal = { reason: 'No repository is recorded.', stage: buildStages.task };
+		expect(stoppedBefore('Finding the repository', refusal)).toEqual({
+			report: {
+				checkout: '',
+				failedStep: 'Finding the repository',
+				failedStage: buildStages.task,
+				commitCount: 0,
+				diffStat: '',
+				isPushed: false
+			},
+			lastLines: ['No repository is recorded.']
 		});
 	});
 });

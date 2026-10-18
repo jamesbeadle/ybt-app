@@ -1,6 +1,7 @@
 const answerShapes = {
 	handedOver: /^".*" is built on \S+\. Review task raised for /,
 	released: /^Recorded on ".*": released by /,
+	setAside: /^Recorded on ".*": considered by /,
 	madeBuildable: /^".*": Buildable by /
 } as const;
 
@@ -12,6 +13,11 @@ export function confirmedHandOver(answer: string, branch: string): string {
 /** YBT's answer once it has recorded the task as released; any other answer is a refusal. */
 export function confirmedRelease(answer: string): string {
 	return confirmed(answer, answerShapes.released, 'YBT did not record the task as released');
+}
+
+/** YBT's answer once it has set the task aside as needing an infrastructure change; any other answer is a refusal. */
+export function confirmedSetAside(answer: string): string {
+	return confirmed(answer, answerShapes.setAside, 'YBT did not set the task aside');
 }
 
 /** YBT's answer once the next tier may build the task; any other answer is a refusal, raised naming the tier. */
